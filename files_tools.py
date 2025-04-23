@@ -70,8 +70,19 @@ def process_raw_consumption_file(consumption_data_path, consumption_data_folder,
     df["datetime"] = pd.to_datetime(df["datetime"], dayfirst=True, errors="coerce")
     df["consommation"] = pd.to_numeric(df["consommation"], errors="coerce")
 
+    # Suppression des enregistrements pour lesquels un seul enregistrement est présent pour la journée
+    df["date"] = df["datetime"].dt.date
+    df = df[df.groupby("date")["date"].transform("size") > 1]
+
+    # Suppression de la colonne temporaire "date_tmp"
+    df = df.drop(columns="date")
+
+    # Tri des lignes par datetime pour conserver un ordre chronologique
+    df = df.sort_values('datetime').reset_index(drop=True)
+
     # Sauvegarde du DataFrame nettoyé dans un fichier CSV
-    df.to_csv(os.path.join(consumption_data_path, clean_csv_filename), sep=";", index=False)
+    outpath = os.path.join(consumption_data_path, clean_csv_filename)
+    df.to_csv(outpath, sep=";", index=False)
 
     return df
 
@@ -130,8 +141,11 @@ def process_raw_production_repo(production_data_path, production_data_folder,
     df_all["production"] = pd.to_numeric(df_all["production"],
                                          errors="coerce")
 
+    # Tri des lignes par datetime pour conserver un ordre chronologique
+    df_all = df_all.sort_values('datetime').reset_index(drop=True)
+
     # Sauvegarder le fichier concaténé
     output_path = os.path.join(production_data_path, clean_csv_filename)
-    df_all.to_csv(output_path, index=False)
+    df_all.to_csv(output_path, sep=";", index=False)
 
     return df_all
