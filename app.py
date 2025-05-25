@@ -1,12 +1,18 @@
 # ------------------------------- IMPORTS ------------------------------------ #
 
 import os
-import pandas as pd
 import streamlit as st
 import locale
 
-# Configuration pour l'affichage des dates en français
-# locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+# Essaie de définir la locale française
+try:
+    locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')  # Unix/Linux/Mac
+except locale.Error:
+    try:
+        locale.setlocale(locale.LC_TIME, 'fr_FR')    # Windows
+    except locale.Error:
+        print("⚠️ Impossible de définir la locale française. Vérifiez qu'elle est installée.")
+
 
 # Import des fonctions utilitaires
 from files_tools import process_raw_consumption_file, process_raw_production_repo
@@ -23,7 +29,7 @@ prod_path = os.path.join('data', 'prod')
 
 # Lecture et nettoyage des données de consommation électrique
 conso_df = process_raw_consumption_file(consumption_data_path = conso_path,
-                                        consumption_data_folder="mes-donnees-elec-2025-04-22",
+                                        consumption_data_folder="mes-donnees-elec-2025-05-25",
                                         raw_csv_filename="mes-puissances-atteintes-30min-004033466112-56140.csv",
                                         clean_csv_filename="consumption_data.csv")
 

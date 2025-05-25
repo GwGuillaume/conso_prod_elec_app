@@ -87,6 +87,72 @@ def process_raw_consumption_file(consumption_data_path, consumption_data_folder,
     return df
 
 
+import os
+import glob
+import zipfile
+import shutil
+
+
+# ----------- DÉCOMPRESSION DES ARCHIVES ET RENOMMAGE DES FICHIERS -------------- #
+def extract_and_organize_zip_files(zip_folder_path: str, delete_archives: bool = False):
+    """
+    Décompresse tous les fichiers ZIP présents dans un dossier, renomme le fichier extrait
+    selon le nom du dossier de décompression, puis le déplace vers le dossier parent.
+
+    Les dossiers de décompression sont ensuite supprimés. Les archives ZIP peuvent être
+    supprimées si souhaité.
+
+    Paramètres :
+    ------------
+    zip_folder_path : str
+        Chemin vers le dossier contenant les fichiers ZIP à traiter.
+
+    delete_archives : bool, par défaut False
+        Si True, les fichiers ZIP originaux sont supprimés après traitement.
+
+    Effets :
+    --------
+    - Chaque archive ZIP est extraite dans un dossier temporaire.
+    - Le fichier CSV extrait est renommé avec le nom du dossier (même nom que l'archive, sans extension).
+    - Ce fichier est déplacé dans le dossier racine (zip_folder_path).
+    - Les dossiers temporaires de décompression sont supprimés.
+    - Les archives ZIP peuvent être supprimées selon l'option delete_archives.
+    """
+
+    # Liste tous les fichiers ZIP dans le dossier donné
+    zip_files = glob.glob(os.path.join(zip_folder_path, "*.zip"))
+
+    for zip_file in zip_files:
+        # Nom sans extension .zip
+        base_name = os.path.splitext(os.path.basename(zip_file))[0]
+        extract_dir = os.path.join(zip_folder_path, base_name)
+
+        # Crée un dossier temporaire pour l'extraction
+        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+            zip_ref.extractall(extract_dir)
+
+        # Cherche le fichier extrait dans le dossier (supposé unique)
+        extracted_files = glob.glob(os.path.join(extract_dir, "*"))
+        if len(extracted_files) != 1:
+            print(f"⚠️ Fichier inattendu dans {extract_dir}, attendu un seul fichier.")
+            continue
+
+        extracted_file = extracted_files[0]
+        ext = os.path.splitext(extracted_file)[1]
+        new_filename = base_name + ext
+        new_filepath = os.path.join(zip_folder_path, new_filename)
+
+        # Déplacement et renommage
+        shutil.move(extracted_file, new_filepath)
+
+        # Suppression du dossier temporaire
+        shutil.rmtree(extract_dir)
+
+        # Suppression de l'archive si demandé
+        if delete_archives:
+            os.remove(zip_file)
+
+
 # -------------------- TRAITEMENT DES FICHIERS DE PRODUCTION -------------------- #
 def process_raw_production_repo(production_data_path, production_data_folder,
                                 raw_csv_root_filename, clean_csv_filename):
@@ -117,6 +183,10 @@ def process_raw_production_repo(production_data_path, production_data_folder,
         DataFrame contenant deux colonnes : 'datetime' (horodatage) et 'production'
                                             (en watts).
     """
+
+    # Décompression des archives et renommage des ficheir
+    extract_and_organize_zip_files("data/prod/raw_csv_files", delete_archives=True)
+
     # Recherche de tous les fichiers CSV correspondant au motif dans le dossier spécifié
     csv_files = glob.glob(os.path.join(production_data_path,
                                        production_data_folder,

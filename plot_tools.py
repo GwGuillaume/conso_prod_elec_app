@@ -42,10 +42,12 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode_affichage: str):
 
     # Titres des subplots
     if mode_affichage == "Hebdomadaire":
+        vspace = 0.03
         subplot_titles = [
             f"Semaine du {p.strftime('%d %B')} au {(p + pd.offsets.Day(6)).strftime('%d %B %Y')}"
             for p in periodes]
     elif mode_affichage == "Mensuel":
+        vspace = 0.1
         subplot_titles = [
             f"Mois de {p.strftime("%B %Y")}"
             for p in periodes]
@@ -54,7 +56,7 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode_affichage: str):
         rows=nb_subplots,
         cols=1,
         shared_yaxes=True,
-        vertical_spacing=0.1,  # Espacement vertical entre 2 subplots successifs
+        vertical_spacing=vspace,  # Espacement vertical entre 2 subplots successifs
         subplot_titles=subplot_titles
     )
 
@@ -71,7 +73,7 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode_affichage: str):
         height=400 * nb_subplots,
         template="plotly_white",
         hovermode="x unified",
-        legend=dict(orientation="h", x=0.5, y=1.1, xanchor="center", yanchor="top"),
+        legend=dict(orientation="h", x=0.5, y=1+vspace, xanchor="center", yanchor="top"),
         showlegend=True
     )
 
@@ -128,12 +130,16 @@ def _plot_subplot(df: pd.DataFrame, fig=None, row=None, col=None, show_legend=Tr
     """
     add_trace_args = {"row": row, "col": col} if row and col else {}
 
+    conso_color = "rgba(255, 0, 0, 0.4)"
+    prod_color = "rgba(0, 255, 0, 0.4)"
+    total_color = "rgba(129, 180, 227, 0.3)"
+
     fig.add_trace(go.Scatter(
         x=df["datetime"],
         y=df["consommation"],
         mode="lines",
         name="Consommation",
-        line=dict(color="rgba(255, 0, 0, 0.4)"),
+        line=dict(color=conso_color),
         fill='tozeroy',
         hovertemplate='Consommation : %{y} W<extra></extra>',
         showlegend=show_legend
@@ -144,7 +150,7 @@ def _plot_subplot(df: pd.DataFrame, fig=None, row=None, col=None, show_legend=Tr
         y=df["production"],
         mode="lines",
         name="Production",
-        line=dict(color="rgba(0, 255, 0, 0.4)"),
+        line=dict(color=prod_color),
         fill='tozeroy',
         hovertemplate='Production : %{y} W<extra></extra>',
         showlegend=show_legend
@@ -155,7 +161,7 @@ def _plot_subplot(df: pd.DataFrame, fig=None, row=None, col=None, show_legend=Tr
         y=df["total"],
         mode="lines",
         name="Consommation + Production",
-        line=dict(color="rgba(129, 180, 227, 0.3)"),
+        line=dict(color=total_color),
         fill='tozeroy',
         hovertemplate='Consommation + Production : %{y} W<extra></extra>',
         showlegend=show_legend
