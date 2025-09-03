@@ -1,5 +1,8 @@
-# ------------------------------- IMPORTS ------------------------------------ #
+# -*- coding: utf-8 -*-
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
+# ------------------------------- IMPORTS ------------------------------------ #
 import os
 import streamlit as st
 import locale
@@ -28,16 +31,27 @@ conso_path = os.path.join('data', 'conso')
 prod_path = os.path.join('data', 'prod')
 
 # Lecture et nettoyage des données de consommation électrique
-conso_df = process_raw_consumption_file(consumption_data_path = conso_path,
-                                        consumption_data_folder="mes-donnees-elec-2025-05-25",
-                                        raw_csv_filename="mes-puissances-atteintes-30min-004033466112-56140.csv",
-                                        clean_csv_filename="consumption_data.csv")
+@st.cache_data
+def load_consumption_data():
+    return process_raw_consumption_file(
+        consumption_data_path=conso_path,
+        consumption_data_folder="mes-donnees-elec-2025-09-03",
+        raw_csv_filename="mes-puissances-atteintes-30min-004033466112-56140.csv",
+        clean_csv_filename="consumption_data.csv"
+    )
 
 # Lecture et nettoyage des données de production photovoltaïque
-prod_df = process_raw_production_repo(production_data_path=prod_path,
-                                      production_data_folder="raw_csv_files",
-                                      raw_csv_root_filename="station_power_data_*.csv",
-                                      clean_csv_filename="production_data.csv")
+@st.cache_data
+def load_production_data():
+    return process_raw_production_repo(
+        production_data_path=prod_path,
+        production_data_folder="raw_csv_files",
+        raw_csv_root_filename="station_power_data_*.csv",
+        clean_csv_filename="production_data.csv"
+    )
+# Appels cachés pour qu'ils ne s’exécutent qu’une seule fois (sauf si fichiers changent)
+conso_df = load_consumption_data()
+prod_df = load_production_data()
 
 # Tri des données de consommation et ajout des créneaux manquants (échantillonnage
 # complet)
