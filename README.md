@@ -30,6 +30,7 @@ L'application permet de :
 - Ajuster les créneaux horaires (pas de 15 ou 30 minutes)
 - Filtrer les périodes à visualiser (date et heure de début/fin)
 - Visualiser les courbes de consommation, de production, et leur somme
+
 L'application en ligne associée au dépôt github est accessible depuis le lien suivant : https://suivi-elec-app.streamlit.app/.
 
 ## 📥 Données sources
