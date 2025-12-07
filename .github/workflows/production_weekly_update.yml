@@ -1,0 +1,40 @@
+name: Weekly Production Update (Hoymiles)
+
+on:
+  schedule:
+    # Tous les lundis à 06h00 UTC (≈ 07h00-08h00 France)
+    - cron: "0 6 * * 1"
+  workflow_dispatch:  # Déclenchement manuel possible
+
+concurrency:
+  group: weekly-production-update
+  cancel-in-progress: false  # Empêche les exécutions simultanées
+
+jobs:
+  update-production-weekly:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 📥 Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: ⚡ Run weekly update script
+        run: |
+          echo "🚀 Starting weekly Hoymiles update..."
+          python manage_production_data.py --mode gha --action full
+
+      - name: 💾 Commit and push updated data
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add data/prod/production_data.csv data/prod/raw_prod_files.zip || true
+          git commit -m "🗓️ Mise à jour hebdomadaire des données de production" || echo "Aucun changement à valider"
+          git push

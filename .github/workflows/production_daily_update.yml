@@ -1,0 +1,40 @@
+name: Daily Production Update (Hoymiles)
+
+on:
+  schedule:
+    # Tous les jours à 06h15 UTC (≈ 07h15-08h15 France)
+    - cron: "15 6 * * *"
+  workflow_dispatch:  # Déclenchement manuel possible
+
+concurrency:
+  group: daily-production-update
+  cancel-in-progress: false  # Empêche deux exécutions simultanées
+
+jobs:
+  update-production:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 📥 Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: ⚡ Run daily update script
+        run: |
+          echo "🚀 Starting daily Hoymiles update..."
+          python prod_api_tools/daily_update.py
+
+      - name: 💾 Commit and push updated data
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add data/prod/production_data.csv data/prod/raw_prod_files.zip || true
+          git commit -m "🔄 Mise à jour quotidienne des données de production" || echo "Aucun changement à valider"
+          git push

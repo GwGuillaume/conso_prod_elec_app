@@ -1,0 +1,22 @@
+name: Full Production Download
+
+on:
+  workflow_dispatch:  # Déclenchement manuel
+
+jobs:
+  download-full-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run full production download
+        run: python manage_production_data.py --action backfill

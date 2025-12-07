@@ -1,0 +1,46 @@
+name: Weekly Consumption Update (Enedis)
+
+on:
+  schedule:
+    # Tous les lundis à 07h30 UTC (≈ 08h30-09h30 France)
+    - cron: "30 7 * * 1"
+  workflow_dispatch:  # Déclenchement manuel possible
+
+concurrency:
+  group: weekly-consumption-update
+  cancel-in-progress: false  # Empêche les exécutions simultanées
+
+jobs:
+  update-consumption-weekly:
+    runs-on: ubuntu-latest
+    env:
+      ENEDIS_TOKEN: ${{ secrets.ENEDIS_TOKEN }}
+      PRM: ${{ secrets.PRM }}
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 📥 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install python-dotenv requests
+
+      - name: ⚡ Run weekly update script
+        run: |
+          echo "🚀 Starting weekly Enedis update..."
+          python conso_api_tools/fetch_history.py
+
+      - name: 💾 Commit and push updated data
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add data/conso/consumption_data_*.csv data/conso/raw_conso_files.zip || true
+          git commit -m "🗓️ Mise à jour hebdomadaire des données de consommation" || echo "Aucun changement à valider"
+          git push
