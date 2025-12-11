@@ -18,7 +18,6 @@ load_dotenv()
 # ⚙️ CONFIGURATION PRINCIPALE
 # -------------------------------
 
-load_dotenv()
 USERNAME = getenv("HOYMILES_USER")
 PASSWORD = getenv("HOYMILES_PASSWORD")
 

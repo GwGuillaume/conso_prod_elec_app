@@ -10,8 +10,10 @@ from dotenv import load_dotenv
 
 from common.config import ROOT_PATH
 
-# Chargement des variables depuis .env
-load_dotenv()
+# Charger .env uniquement s'il existe localement
+ENV_FILE = ROOT_PATH / ".env"
+if ENV_FILE.exists():
+    load_dotenv(ENV_FILE)
 
 # -------------------------------
 # ⚙️ CONFIGURATION PRINCIPALE
