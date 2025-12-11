@@ -10,6 +10,7 @@ jobs:
       HOYMILES_USER: ${{ secrets.HOYMILES_USER }}
       HOYMILES_PASSWORD: ${{ secrets.HOYMILES_PASSWORD }}
       HOYMILES_TOKEN: ${{ secrets.HOYMILES_TOKEN }}
+      PYTHONPATH: .
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,7 +21,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install python-dotenv requests
 
-      - name: Run full production download
-        run: python manage_production_data.py --action backfill
+      - name: Run full production download script
+        run: |
+          python prod_api_tools/fetch_history.py
