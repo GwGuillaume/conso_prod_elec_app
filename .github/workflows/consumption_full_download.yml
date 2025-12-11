@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENEDIS_TOKEN: ${{ secrets.ENEDIS_TOKEN }}
-      PRM: ${{ secrets.PRM }}
+      PRM: ${{ secrets.LINKY_PRM }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

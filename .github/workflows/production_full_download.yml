@@ -6,6 +6,10 @@ on:
 jobs:
   download-full-production:
     runs-on: ubuntu-latest
+    env:
+      HOYMILES_USER: ${{ secrets.HOYMILES_USER }}
+      HOYMILES_PASSWORD: ${{ secrets.HOYMILES_PASSWORD }}
+      HOYMILES_TOKEN: ${{ secrets.HOYMILES_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
