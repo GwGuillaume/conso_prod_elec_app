@@ -62,6 +62,7 @@ TO_DELETE/
 token_cache.json
 
 # Données massives non versionnées
+data(save)/
 data/conso/raw_conso_files.zip
 data/prod/raw_prod_files.zip
 
