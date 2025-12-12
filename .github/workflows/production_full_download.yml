@@ -26,6 +26,11 @@ jobs:
           pip install -r requirements.txt
           pip install python-dotenv requests
 
+      - name: Debug env   # Supprimer ce debud une fois validé
+        run: |
+          echo "HOYMILES_USER = $HOYMILES_USER"
+          echo "HOYMILES_PASSWORD length = ${#HOYMILES_PASSWORD}"
+          echo "HOYMILES_TOKEN length = ${#HOYMILES_TOKEN}"
       - name: Run full production download script
         run: |
           python prod_api_tools/fetch_history.py
