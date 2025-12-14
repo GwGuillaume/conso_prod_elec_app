@@ -33,3 +33,20 @@ jobs:
       - name: Run full consumption download script
         run: |
           python conso_api_tools/fetch_history.py
+
+      - name: Commit consumption data to repository
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          
+          # Affichage debug
+          git status
+          
+          # Ajouter uniquement data/
+          git add data/
+          
+          # Commit seulement s'il y a des changements
+          git diff --cached --quiet || git commit -m "📊 Mise à jour automatique des données de consommation"
+          
+          # Push vers main
+          git push
