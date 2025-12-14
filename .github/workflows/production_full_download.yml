@@ -1,5 +1,8 @@
 name: Full Production Download
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:  # Déclenchement manuel
 
@@ -31,6 +34,7 @@ jobs:
           echo "HOYMILES_USER = $HOYMILES_USER"
           echo "HOYMILES_PASSWORD length = ${#HOYMILES_PASSWORD}"
           echo "HOYMILES_TOKEN length = ${#HOYMILES_TOKEN}"
+
       - name: Run full production download script
         run: |
           python prod_api_tools/fetch_history.py
