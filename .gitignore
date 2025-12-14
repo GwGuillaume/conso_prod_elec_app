@@ -63,25 +63,21 @@ token_cache.json
 
 # Données massives non versionnées
 data(save)/
-data/conso/raw_conso_files.zip
-data/prod/raw_prod_files.zip
+#data/conso/raw_conso_files.zip
+#data/prod/raw_prod_files.zip
 
 # Fichiers générés automatiquement durant l'import
-data/conso/conso_1h/
-data/conso/conso_30min/
-data/prod/production_data_1h.csv
-data/prod/production_data_30min.csv
+#data/conso/conso_1h/
+#data/conso/conso_30min/
+#data/prod/production_data_1h.csv
+#data/prod/production_data_30min.csv
 
 # Merged final (recalculable)
-data/merged/global.csv
-
-# Si tu veux versionner des données stables :
-# (Décommenter pour les autoriser)
-# !data/static/
+#data/merged/global.csv
 
 # Exclure les archives téléchargées
-data/prod/raw_csv_files/
-data/conso/mes-donnees-elec-*/
+#data/prod/raw_csv_files/
+#data/conso/mes-donnees-elec-*/
 
 # ===========================================================
 #   GITHUB ACTIONS
