@@ -514,9 +514,12 @@ def fetch_and_archive(target_date: datetime, site_id: int, archive_path: Path, c
         clean_csv_columns(source_csv=csv_extracted, columns_map=prod_csv_map)
 
         # Ajout à l’archive
-        add_file_to_zip(tmp_file=csv_extracted,
-                        zip_path=archive_path,
-                        target_date=target_date)
+        arcname = f"prod_{format_date_to_str(target_date)}.csv"
+        add_file_to_zip(
+            tmp_file=csv_extracted,
+            zip_path=archive_path,
+            arcname=arcname
+        )
 
         # Mise à jour des fichiers resamplés
         append_csvs_with_resampling(

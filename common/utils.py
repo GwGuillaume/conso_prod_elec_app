@@ -362,27 +362,26 @@ def resampled_data_exists_for_date(target_date: datetime,
 # 📦 Gestion des archives ZIP
 # ------------------------------------------------------
 
-def add_file_to_zip(tmp_file: Path, zip_path: Path, target_date: datetime):
+def add_file_to_zip(tmp_file: Path, zip_path: Path, target_date: datetime, arcname: str):
     """
     Ajoute un fichier dans une archive ZIP en le renommant selon la date cible.
 
-    Le nom interne dans le ZIP est : "prod_<YYYY-MM-DD>.csv"
+    Le nom interne dans le ZIP est : "<file_prefix>_<YYYY-MM-DD>.<file_ext>"
     via la fonction format_date_to_str().
 
     Paramètres :
         tmp_file (Path) : chemin du fichier temporaire local
         zip_path (Path) : chemin de l’archive ZIP
         target_date (datetime) : date utilisée pour générer le nouveau nom
+        arcname (str) : chemin/nom du fichier DANS le ZIP
+                        ex:
+                            - prod_2025-03-25.csv
+                            - conso_1h/courbe_2025-03-25.json
     """
-
-    # --- Conversion de date en texte ---
-    new_name = "prod_" + format_date_to_str(target_date) + ".csv"
-
-    # --- Ajout dans le ZIP ---
     with zipfile.ZipFile(zip_path, "a", zipfile.ZIP_DEFLATED) as zipf:
-        zipf.write(tmp_file, arcname=new_name)
+        zipf.write(tmp_file, arcname=arcname)
 
-    print(f"📦 Fichier ajouté dans l’archive sous : {new_name}")
+    print(f"📦 Fichier ajouté dans l’archive sous : {arcname}")
 
 def extract_zip_file_list(zip_path: Path) -> list[str]:
     """

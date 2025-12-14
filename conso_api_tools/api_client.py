@@ -158,7 +158,13 @@ def fetch_and_archive(date_obj: datetime, interval: str):
         print(f"🧾 Données ajoutées à {csv_file}")
 
         # Archive et suppression
-        add_file_to_zip(json_path, config.ZIP_FILE, cname=f"{interval_folder_name}/courbe_{date_str}.json")
+        arcname = f"{interval_folder_name}/courbe_{date_str}.json"
+        add_file_to_zip(
+            tmp_file=json_path,
+            zip_path=config.ZIP_FILE,
+            arcname=arcname
+        )
+        # add_file_to_zip(json_path, config.ZIP_FILE, cname=f"{interval_folder_name}/courbe_{date_str}.json")
         json_path.unlink()
         print(f"✅ {json_path.name} archivé et supprimé localement")
 

@@ -1,5 +1,8 @@
 name: Full Conso Download
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:  # Déclenchement manuel
 
