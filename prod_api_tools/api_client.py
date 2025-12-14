@@ -40,13 +40,53 @@ from prod_api_tools.config import LOGIN_PAGE, USERNAME, PASSWORD, TIMEOUT, DATA_
 load_dotenv()
 
 # ---------------------------------------------------------------------
+# Cache du token Hoymiles en mémoire
+# ---------------------------------------------------------------------
+
+_HOYMILES_TOKEN: Optional[str] = None
+
+# ---------------------------------------------------------------------
 # Helpers pour token
 # ---------------------------------------------------------------------
 
 def _current_token() -> Optional[str]:
-    """Retourne le token HOYMILES_TOKEN depuis .env ou l'environnement."""
-    load_dotenv(override=True)  # recharge le .env à chaque appel
-    return getenv("HOYMILES_TOKEN")
+    """
+    Retourne le token Hoymiles actif.
+
+    Priorité :
+    1️⃣ Token stocké en mémoire (_HOYMILES_TOKEN)
+    2️⃣ Variable d'environnement HOYMILES_TOKEN
+
+    Le token est mis en cache lors du premier accès afin d'éviter
+    les relectures inutiles de l'environnement.
+
+    Retour
+    ------
+    str | None
+        Le token récupéré, ou None en cas d'échec.
+    """
+    global _HOYMILES_TOKEN
+
+    if _HOYMILES_TOKEN is None:
+        _HOYMILES_TOKEN = getenv("HOYMILES_TOKEN")
+
+    return _HOYMILES_TOKEN
+
+def set_current_token(token: str) -> None:
+    """
+    Met à jour le token Hoymiles en mémoire.
+
+    Cette fonction est indispensable dans les scripts longue durée
+    (ex: GitHub Actions), car les variables d'environnement mises à jour
+    via GITHUB_ENV ne sont PAS visibles dans le process Python en cours.
+
+    Paramètre
+    ---------
+    token : str
+        Nouveau token Hoymiles valide
+    """
+    global _HOYMILES_TOKEN
+    _HOYMILES_TOKEN = token
 
 def safe_find_multiple(driver, selectors):
     """Essaie plusieurs sélecteurs CSS/XPath en renvoyant le premier élément trouvé."""
@@ -188,6 +228,9 @@ def refresh_token(mode: str = "local") -> Optional[str]:
         return None
 
     print("✅ Token récupéré avec succès.")
+
+    # Mise à jour immédiate du token en mémoire
+    set_current_token(token)
 
     if mode == "local":
         # On suppose que le .env est à la racine du projet
@@ -492,48 +535,3 @@ def fetch_and_archive(target_date: datetime, site_id: int, archive_path: Path, c
 
     finally:
         shutil.rmtree(temp_file, ignore_errors=True)
-
-    # temp_dir = tempfile.TemporaryDirectory()
-    # temp_file = Path(temp_dir.name)
-    # try:
-    #     try:
-    #         zip_path = download_raw_production_zip_file(site_id=site_id,
-    #                                                     target_date=target_date,
-    #                                                     dest_dir=temp_file)
-    #     except Exception as e:
-    #         msg = str(e).lower()
-    #         if "token error" in msg or "401" in msg or "403" in msg or "verify" in msg:
-    #             print("⚠️ Problème de token détecté — tentative de rafraîchissement...")
-    #             new_token = refresh_token(mode="gha" if getenv("GITHUB_ACTIONS") else "local")
-    #             if not new_token:
-    #                 raise RuntimeError("❌ Impossible de rafraîchir le token Hoymiles.")
-    #             zip_path = download_raw_production_zip_file(site_id=site_id,
-    #                                                         target_date=target_date,
-    #                                                         dest_dir=temp_file)
-    #         else:
-    #             raise
-    #
-    #     csv_extracted = extract_csv_from_zip(zip_path=zip_path,
-    #                                          dest_folder=temp_file)
-    #     # Mapping des colonnes Hoymiles
-    #     prod_csv_map = {
-    #         "Time": "datetime",
-    #         "Production (W)": "production",
-    #     }
-    #     # Extraction, et renommage des colonnes du fichier csv
-    #     clean_csv_columns(source_csv=csv_extracted, columns_map=prod_csv_map)
-    #     # Renommage du fichier csv et ajout à l'archive
-    #     add_file_to_zip(tmp_file=csv_extracted, zip_path=archive_path, target_date=target_date)
-    #     append_csvs_with_resampling(csv_paths=[csv_extracted],
-    #                                 csv_30min=csv_path_30min,
-    #                                 csv_1h=csv_path_1h)
-    #     print(f"✅ Données de production intégrées pour {target_date}")
-    #     sleep(1)  # pour éviter la surcharge de l'API
-    #     return True
-    #
-    # except Exception as e:
-    #     print(f"❌ Erreur lors du traitement de {target_date} : {e}")
-    #     return False
-    #
-    # finally:
-    #     shutil.rmtree(temp_file, ignore_errors=True)
