@@ -67,7 +67,7 @@ def download_interval_data(date_str: str, interval: str = "30min") -> dict | Non
         dict : données JSON renvoyées par l'API
     """
     day_after = format_date_to_str(next_day(format_str_to_date(date_str)))
-    url = f"{config.API_BASE_URL}?prm={config.PRM}&start={date_str}&end={day_after}"
+    url = f"{config.API_BASE_URL}?prm={config.LINKY_PRM}&start={date_str}&end={day_after}"
 
     response = requests.get(url, headers=_get_headers(), timeout=20)
     try:

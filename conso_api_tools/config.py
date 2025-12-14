@@ -2,7 +2,7 @@
 config.py
 
 Chargement de la configuration depuis le fichier .env
-(enedis token, PRM, chemins de fichiers, etc.)
+(enedis token, linky PRM, chemins de fichiers, etc.)
 """
 
 from os import getenv
@@ -20,10 +20,10 @@ if ENV_FILE.exists():
 # -------------------------------
 
 ENEDIS_TOKEN = getenv("ENEDIS_TOKEN")
-PRM = getenv("LINKY_PRM")
+LINKY_PRM = getenv("LINKY_PRM")
 
-if not ENEDIS_TOKEN or not PRM:
-    raise RuntimeError("⚡ ENEDIS_TOKEN ou PRM non définis dans .env")
+if not ENEDIS_TOKEN or not LINKY_PRM:
+    raise RuntimeError("⚡ ENEDIS_TOKEN ou LINKY_PRM non définis dans .env")
 
 # Répertoire de stockage des fichiers JSON et CSV
 BASE_DATA_DIR = ROOT_PATH.joinpath("data/conso")

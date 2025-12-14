@@ -6,7 +6,6 @@ Configuration centrale pour la gestion des données de production Hoymiles.
 """
 
 from os import getenv
-from pathlib import Path
 from dotenv import load_dotenv
 
 from common.config import ROOT_PATH
