@@ -362,17 +362,13 @@ def resampled_data_exists_for_date(target_date: datetime,
 # 📦 Gestion des archives ZIP
 # ------------------------------------------------------
 
-def add_file_to_zip(tmp_file: Path, zip_path: Path, target_date: datetime, arcname: str):
+def add_file_to_zip(tmp_file: Path, zip_path: Path, arcname: str):
     """
     Ajoute un fichier dans une archive ZIP en le renommant selon la date cible.
-
-    Le nom interne dans le ZIP est : "<file_prefix>_<YYYY-MM-DD>.<file_ext>"
-    via la fonction format_date_to_str().
 
     Paramètres :
         tmp_file (Path) : chemin du fichier temporaire local
         zip_path (Path) : chemin de l’archive ZIP
-        target_date (datetime) : date utilisée pour générer le nouveau nom
         arcname (str) : chemin/nom du fichier DANS le ZIP
                         ex:
                             - prod_2025-03-25.csv
