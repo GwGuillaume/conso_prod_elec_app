@@ -28,11 +28,6 @@ jobs:
           pip install -r requirements.txt
           pip install python-dotenv requests
 
-      - name: Debug env   # Supprimer ce debud une fois validé
-        run: |
-          echo "ENEDIS_TOKEN length = ${#ENEDIS_TOKEN}"
-          echo "LINKY_PRM = $LINKY_PRM"
-
       - name: Run full consumption download script
         run: |
           python conso_api_tools/fetch_history.py

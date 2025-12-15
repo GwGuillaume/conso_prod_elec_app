@@ -17,7 +17,7 @@ jusqu’à la veille du jour courant.
 """
 
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from conso_api_tools import config
 from conso_api_tools.config import FOLDER_30MIN, FOLDER_1H
@@ -41,6 +41,8 @@ def fetch_all_missing_data(start_date: datetime = START_DATE):
         new_1h = fetch_and_archive(date_incr, interval="1h")
         # 30min
         new_30min = fetch_and_archive(date_incr, interval="30min")
+        # Incrémentation d'une journée
+        date_incr = date_incr + timedelta(days=1)
     # Suppression des dossiers temporaires
     tmp_folders = [Path(FOLDER_1H), Path(FOLDER_30MIN)]
     cleanup_folders(tmp_folders)

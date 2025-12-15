@@ -48,6 +48,7 @@ def fetch_all_missing_data(start_date: datetime = START_DATE):
             fetch_and_archive(date_incr, SITE_ID, ARCHIVE_FILE, CSV_30MIN, CSV_1H)
         except Exception as e:
             print(f"❌ Erreur lors du traitement de {format_date_to_str(date_incr)}: {e}")
+        # Incrémentation d'une journée
         date_incr = date_incr + timedelta(days=1)
     cleanup_folders([RAW_FOLDER])
     print("📦 Historique de production mis à jour.")
