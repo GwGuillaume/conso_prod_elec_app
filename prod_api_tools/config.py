@@ -20,9 +20,6 @@ load_dotenv()
 USERNAME = getenv("HOYMILES_USER")
 PASSWORD = getenv("HOYMILES_PASSWORD")
 
-if not USERNAME or not PASSWORD:
-    raise RuntimeError("HOYMILES_USER ou HOYMILES_PASSWORD non définis dans .env")
-
 LOGIN_PAGE = "https://global.hoymiles.com/website/login"
 TIMEOUT = 20
 
