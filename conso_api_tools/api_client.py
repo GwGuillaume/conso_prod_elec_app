@@ -140,11 +140,12 @@ def fetch_and_archive(date_obj: datetime, interval: str):
     folder = config.FOLDER_30MIN if interval == "30min" else config.FOLDER_1H
     csv_file = config.CSV_30MIN if interval == "30min" else config.CSV_1H
     interval_folder_name = "conso_30min" if interval == "30min" else "conso_1h"
+    arcname = f"{interval_folder_name}/conso_{date_str}.json"
 
     if check_json_in_archive(zip_path=config.ZIP_FILE,
                              date_str=date_str,
                              interval_folder=interval_folder_name):
-        print(f"📂 {interval_folder_name}/courbe_{date_str}.json déjà présent dans l’archive, pas de téléchargement.")
+        print(f"📂 {arcname} déjà présent dans l’archive, pas de téléchargement.")
         return False
 
     # Téléchargement
@@ -157,14 +158,12 @@ def fetch_and_archive(date_obj: datetime, interval: str):
         append_to_csv(data, csv_file)
         print(f"🧾 Données ajoutées à {csv_file}")
 
-        # Archive et suppression
-        arcname = f"{interval_folder_name}/courbe_{date_str}.json"
+        # Archivage et suppression
         add_file_to_zip(
             tmp_file=json_path,
             zip_path=config.ZIP_FILE,
             arcname=arcname
         )
-        # add_file_to_zip(json_path, config.ZIP_FILE, cname=f"{interval_folder_name}/courbe_{date_str}.json")
         json_path.unlink()
         print(f"✅ {json_path.name} archivé et supprimé localement")
 
