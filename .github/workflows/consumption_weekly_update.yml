@@ -1,5 +1,8 @@
 name: Weekly Consumption Update (Enedis)
 
+permissions:
+  contents: write
+
 on:
   schedule:
     # Tous les lundis à 07h30 UTC (≈ 08h30-09h30 France)
@@ -15,7 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENEDIS_TOKEN: ${{ secrets.ENEDIS_TOKEN }}
-      PRM: ${{ secrets.PRM }}
+      LINKY_PRM: ${{ secrets.LINKY_PRM }}
+      PYTHONPATH: .
 
     steps:
       - name: 📦 Checkout repository
@@ -24,7 +28,7 @@ jobs:
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
       - name: 📥 Install dependencies
         run: |
