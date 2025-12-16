@@ -127,7 +127,7 @@ def save_json(data: dict, date_str: str, interval_folder: str) -> Path:
         Path : chemin complet du fichier sauvegardé
     """
     ensure_folder(interval_folder)
-    file_path = Path(interval_folder) / f"courbe_{date_str}.json"
+    file_path = Path(interval_folder) / f"conso_{date_str}.json"
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     return file_path

@@ -19,7 +19,6 @@ jusqu’à la veille du jour courant.
 from pathlib import Path
 from datetime import datetime, timedelta
 
-from conso_api_tools import config
 from conso_api_tools.config import FOLDER_30MIN, FOLDER_1H
 from conso_api_tools.api_client import fetch_and_archive
 from common.utils import cleanup_folders, format_date_to_str, print_section, yesterday

@@ -22,9 +22,6 @@ if ENV_FILE.exists():
 ENEDIS_TOKEN = getenv("ENEDIS_TOKEN")
 LINKY_PRM = getenv("LINKY_PRM")
 
-if not ENEDIS_TOKEN or not LINKY_PRM:
-    raise RuntimeError("⚡ ENEDIS_TOKEN ou LINKY_PRM non définis dans .env")
-
 # Répertoire de stockage des fichiers JSON et CSV
 BASE_DATA_DIR = ROOT_PATH.joinpath("data/conso")
 BASE_DATA_DIR.mkdir(parents=True, exist_ok=True)
