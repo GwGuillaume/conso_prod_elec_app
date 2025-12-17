@@ -137,3 +137,20 @@ def select_period(display_mode: str, df: pd.DataFrame):
     else:
         st.error("Mode d'affichage non reconnu.")
         return None, None, None, None
+
+# ----------------------------------------------------------------------
+# 📊 Choix du type de graphique
+# ----------------------------------------------------------------------
+
+def select_chart_type() -> str:
+    """
+    Permet à l'utilisateur de choisir le type de représentation graphique :
+    - Courbe (time series)
+    - Histogramme (barres)
+    """
+    chart_type = st.sidebar.selectbox(
+        label="Type de graphique",
+        options=["Courbe", "Histogramme"],
+        index=0
+    )
+    return chart_type

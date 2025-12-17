@@ -11,7 +11,7 @@ from typing import List, Tuple
 import streamlit as st
 import pandas as pd
 
-from app.ui.widgets import select_mode, select_period
+from app.ui.widgets import select_mode, select_period, select_chart_type
 from app.core.visualization import plot_production_vs_consumption, build_multi_period_figure
 from app.core.statistics import compute_basic_stats, get_summary_info
 from app.core.periods import extract_periods
@@ -34,6 +34,7 @@ def render_app(df: pd.DataFrame) -> None:
     st.sidebar.header(body="⚙️ Paramètres d'affichage")
 
     mode = select_mode()
+    chart_type = select_chart_type()
 
     # --- Sélection de la période principale (toujours deux bornes) ---
     if df.empty:
@@ -100,9 +101,9 @@ def render_app(df: pd.DataFrame) -> None:
 
     # --- Figure principale selon le mode ---
     if mode == "Classique" or mode == "Journée spécifique":
-        fig = plot_production_vs_consumption(df=df_filtered, mode=mode)
+        fig = plot_production_vs_consumption(df=df_filtered, mode=mode, chart_type=chart_type)
     elif mode == "Hebdomadaire" or mode == "Mensuel":
-        fig = build_multi_period_figure(df=df_filtered, freq=freq)
+        fig = build_multi_period_figure(df=df_filtered, freq=freq, chart_type=chart_type)
     else:
         st.error(body="Mode inconnu.")
         return

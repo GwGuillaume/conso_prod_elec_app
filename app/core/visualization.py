@@ -18,7 +18,7 @@ Les DataFrame en entrée sont supposées contenir au minimum :
 Toutes les fonctions renvoient un objet plotly.graph_objects.Figure.
 """
 
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union
 import pandas as pd
 import plotly.graph_objects as go
 from .config import PLOT_THEME
@@ -40,57 +40,59 @@ def make_timeseries_trace(
         customdata: Optional[Iterable] = None,
         line_dash: Optional[str] = None,
         line_width: int = 2,
-        ) -> go.Scatter:
+        chart_type: str = "Courbe"
+        ) -> go.Scatter | go.Bar:
     """
-    Crée une trace time-series (plotly.graph_objects.Scatter) standardisée.
+    Crée une trace Plotly standardisée pour séries temporelles.
 
-    Paramètres
-    ----------
-    x : Iterable
-        Valeurs d'axe X (horodatages).
-    y : Iterable
-        Valeurs d'axe Y.
-    name : str
-        Nom de la trace (légende).
-    mode : str
-        Mode d'affichage ('lines', 'markers', 'lines+markers').
-    yaxis : Optional[str]
-        Si 'y2', associe la trace à l'axe droit.
-    visible : bool
-        Visible par défaut dans la légende.
-    hovertemplate : Optional[str]
-        Template d'affichage au survol (Plotly).
-    customdata : Iterable
-        Custom fields
-    line_dash : Optional[str]
-        Style de ligne ('dash', 'dot', etc.).
-    line_width : int
-        Epaisseur de la ligne.
+    Selon le paramètre chart_type :
+    - "Courbe"      → go.Scatter (ligne)
+    - "Histogramme" → go.Bar (barres)
 
     Retour
     ------
-    go.Scatter
-        Trace prête à être ajoutée à une figure.
+    Trace Plotly prête à être ajoutée à une figure.
     """
-    trace = go.Scatter(
-        x=x,
-        y=y,
-        name=name,
-        mode=mode,
-        visible=visible,
-        hovertemplate=hovertemplate,
-        customdata=customdata,
-        line=dict(dash=line_dash or "solid", width=line_width),
-    )
+
+    if chart_type == "Histogramme":
+        # Largeur par défaut des barres temporelles (en ms)
+        bar_width = 30 * 60 * 1000  # 30 minutes
+        trace = go.Bar(
+            x=x,
+            y=y,
+            name=name,
+            visible=visible,
+            hovertemplate=hovertemplate,
+            customdata=customdata,
+            width=bar_width
+        )
+    else:
+        # Courbe par défaut
+        trace = go.Scatter(
+            x=x,
+            y=y,
+            name=name,
+            mode=mode,
+            visible=visible,
+            hovertemplate=hovertemplate,
+            customdata=customdata,
+            line=dict(dash=line_dash or "solid", width=line_width),
+        )
+
     if yaxis:
         trace.update(yaxis=yaxis)
+
     return trace
 
 
 # --------------------------------------------------
 # Figure principale : production vs consommation
 # --------------------------------------------------
-def plot_production_vs_consumption(df: pd.DataFrame, mode: str = "Classique") -> go.Figure:
+def plot_production_vs_consumption(
+        df: pd.DataFrame,
+        mode: str = "Classique",
+        chart_type: str = "Courbe"
+    ) -> go.Figure:
     """
     Construit la figure principale affichant la consommation, la production
     et leur somme (total) selon le DataFrame fourni.
@@ -104,8 +106,10 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode: str = "Classique") ->
         - 'consommation' (numérique)
         - optionnellement 'total'
     mode : str
-        Mode d'affichage (ex. "Classique", "Hebdomadaire", "Mensuel", "Journée spécifique").
+        Mode d'affichage ("Classique", "Hebdomadaire", "Mensuel" ou "Journée spécifique").
         Influence le titre et l'agrégation éventuelle.
+    chart_type : str
+        Type d'affichage (courbe ou histogramme)
 
     Retour
     ------
@@ -128,7 +132,10 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode: str = "Classique") ->
                 hovertemplate="%{customdata}<br>Consommation : %{y:.0f}<extra></extra>",
                 customdata=df_local["datetime_fr"],
                 line_dash="solid",
-                line_width=2))
+                line_width=2,
+                chart_type=chart_type
+            )
+        )
 
     if "production" in df_local.columns:
         fig.add_trace(
@@ -138,8 +145,11 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode: str = "Classique") ->
                 name="Production",
                 hovertemplate="%{customdata}<br>Production : %{y:.0f}<extra></extra>",
                 customdata=df_local["datetime_fr"],
-                line_dash="dot",
-                line_width=2))
+                line_dash="solid",
+                line_width=2,
+                chart_type=chart_type
+            )
+        )
 
     if "total" in df_local.columns and df_local["total"].notna().any():
         fig.add_trace(
@@ -149,8 +159,11 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode: str = "Classique") ->
                 name="Total (prod + conso)",
                 hovertemplate="%{customdata}<br>Total : %{y:.0f}<extra></extra>",
                 customdata=df_local["datetime_fr"],
-                line_dash="dash",
-                line_width=3))
+                line_dash="solid",
+                line_width=2,
+                chart_type=chart_type
+            )
+        )
 
     title = f"Consommation vs Production — {mode}"
     fig.update_layout(
@@ -172,16 +185,26 @@ def plot_production_vs_consumption(df: pd.DataFrame, mode: str = "Classique") ->
         hovermode="x unified"
         )
 
+    if chart_type == "Histogramme":
+        fig.update_layout(barmode="group")
+
     return fig
 
 
 # --------------------------------------------------
 # Vue agrégée (hebdo / mensuelle) — optionnel
 # --------------------------------------------------
-def build_multi_period_figure(df: pd.DataFrame, freq: str = "W") -> go.Figure:
+def build_multi_period_figure(
+        df: pd.DataFrame,
+        freq: str = "W",
+        chart_type: str = "Courbe"
+    ) -> go.Figure:
     """
     Construit une figure agrégée en sommant les données par période.
     - freq : 'W' pour hebdomadaire, 'ME' pour mensuel, 'D' pour jour
+    Les types de graphiques dépendent de chart_type :
+    - "Courbe"      → go.Scatter (ligne)
+    - "Histogramme" → go.Bar (barres)
 
     Paramètres
     ----------
@@ -189,6 +212,8 @@ def build_multi_period_figure(df: pd.DataFrame, freq: str = "W") -> go.Figure:
         DataFrame contenant 'datetime', 'production', 'consommation'
     freq : str
         Fréquence de rééchantillonnage ('D', 'W', 'ME')
+    chart_type : str
+        Type d'affichage (courbe ou histogramme)
 
     Retour
     ------
@@ -219,23 +244,31 @@ def build_multi_period_figure(df: pd.DataFrame, freq: str = "W") -> go.Figure:
             x=agg["datetime"],
             y=agg["consommation"],
             name="Consommation",
-            hovertemplate="%{customdata}<br>Consommation: %{y:.0f}<extra></extra>",
-            customdata=agg["period_fr"]))
+            hovertemplate="%{customdata}<br>Consommation : %{y:.0f}<extra></extra>",
+            customdata=agg["period_fr"],
+            chart_type=chart_type
+        )
+    )
     fig.add_trace(
         make_timeseries_trace(
             x=agg["datetime"],
             y=agg["production"],
             name="Production",
-            hovertemplate="%{customdata}<br>Production: %{y:.0f}<extra></extra>",
-            customdata=agg["period_fr"]))
+            hovertemplate="%{customdata}<br>Production : %{y:.0f}<extra></extra>",
+            customdata=agg["period_fr"],
+            chart_type=chart_type
+        )
+    )
     fig.add_trace(
         make_timeseries_trace(
             x=agg["datetime"],
             y=agg["total"],
             name="Total",
-            hovertemplate="%{customdata}<br>Production: %{y:.0f}<extra></extra>",
+            hovertemplate="%{customdata}<br>Total : %{y:.0f}<extra></extra>",
             customdata=agg["period_fr"],
-            line_width=3))
+            chart_type=chart_type
+        )
+    )
 
     freq_label = "W" if freq == "W" else "ME"
     fig.update_layout(
@@ -245,4 +278,8 @@ def build_multi_period_figure(df: pd.DataFrame, freq: str = "W") -> go.Figure:
         yaxis_title="Énergie",
         hovermode="x unified",
         legend=dict(orientation="h", y=1.02, x=0.01))
+
+    if chart_type == "Histogramme":
+        fig.update_layout(barmode="group")
+
     return fig

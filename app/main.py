@@ -61,28 +61,6 @@ def main():
     # --- Rendu principal de l'application ---
     render_app(merged_df)
 
-    # # Choix utilisateur
-    # st.markdown("### 📅 Choix du mode d'affichage")
-    # mode = select_mode()
-    # start_datetime, end_datetime = select_period(mode, merged_df)
-    #
-    # # Filtrage
-    # df_filtered = merged_df[
-    #     (merged_df["datetime"] >= start_datetime) &
-    #     (merged_df["datetime"] <= end_datetime)
-    # ]
-    #
-    # # Informations générales
-    # st.markdown("### ⚡️ Consommation, Production et Total")
-    # st.markdown(get_summary_info(df_filtered, mode))
-    #
-    # # Graphique
-    # st.markdown("⚙️ Cliquez sur la légende pour activer/désactiver les courbes.")
-    # fig = plot_production_vs_consumption(df_filtered, mode)
-    # # ID unique basé sur le mode + borne de dates
-    # chart_key = f"plot_{mode}_{start_datetime.strftime('%Y%m%d%H%M')}_{end_datetime.strftime('%Y%m%d%H%M')}"
-    #
-    # st.plotly_chart(fig, use_container_width=True, key=chart_key)
 
 if __name__ == "__main__":
     main()
