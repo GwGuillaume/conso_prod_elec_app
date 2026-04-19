@@ -58,6 +58,12 @@ temp/
 # Dossier de code à supprimer
 TO_DELETE/
 
+# Dossier Intellij
+.idea/
+
+# Fichier de test
+test_plotly_locale.py
+
 # Token & credentials générés automatiquement
 token_cache.json
 

@@ -13,7 +13,7 @@ Fonctionnalités :
 """
 
 from datetime import datetime, timedelta
-from prod_api_tools.config import SITE_ID, ARCHIVE_FILE, CSV_FILE, RAW_FOLDER
+from prod_api_tools.config import SITE_ID, ARCHIVE_FILE, CSV_30MIN, CSV_1H, RAW_FOLDER
 from prod_api_tools.api_client import fetch_and_archive
 from common.file_utils import cleanup_folders
 from common.utils import print_section, format_date
@@ -23,7 +23,7 @@ def main():
     yesterday = datetime.now() - timedelta(days=1)
     print_section(f"☀️ Mise à jour quotidienne de la production ({format_date(yesterday)})")
 
-    downloaded = fetch_and_archive(yesterday, SITE_ID, ARCHIVE_FILE, CSV_FILE)
+    downloaded = fetch_and_archive(yesterday, SITE_ID, ARCHIVE_FILE, CSV_30MIN, CSV_1H)
     cleanup_folders([RAW_FOLDER])
 
     print_section("✅ Récapitulatif")

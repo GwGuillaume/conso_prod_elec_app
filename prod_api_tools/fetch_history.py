@@ -2,17 +2,17 @@
 """
 fetch_history.py
 
-Télécharge l’historique complet des données de production depuis une date donnée
-jusqu’à la veille du jour courant.
+Télécharge l'historique complet des données de production depuis une date donnée
+jusqu'à la veille du jour courant.
 
 Fonctionnalités :
-- Vérifie pour chaque date si les fichiers existent déjà dans l’archive
+- Vérifie pour chaque date si les fichiers existent déjà dans l'archive
 - Télécharge uniquement les jours manquants
 - Ajoute les nouvelles données au fichier production_data.csv
 - Archive les CSV dans raw_prod_files.zip
 - Supprime les dossiers temporaires
 
-🧩 Exemple d’utilisation :
+🧩 Exemple d'utilisation :
     python prod_api_tools/fetch_history.py
 """
 
@@ -39,7 +39,7 @@ def fetch_all_missing_data(start_date: datetime = START_DATE):
     Paramètre :
         start_date (datetime) : date de début (incluse)
     """
-    print_section(f"📡 Téléchargement de l’historique Hoymiles depuis le {format_date_to_str(start_date)}")
+    print_section(f"📡 Téléchargement de l'historique Hoymiles depuis le {format_date_to_str(start_date)}")
     date_incr = start_date
 
     while date_incr <= yesterday() :
