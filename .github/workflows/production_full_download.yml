@@ -43,7 +43,7 @@ jobs:
           git status
           
           # Ajouter uniquement data/
-          git add data/
+          git add -f data/
           
           # Commit seulement s'il y a des changements
           git diff --cached --quiet || git commit -m "📊 Mise à jour automatique des données de production"
