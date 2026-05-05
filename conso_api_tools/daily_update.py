@@ -12,7 +12,14 @@ Fonctionnalités :
 - Affiche la progression et un récapitulatif clair
 """
 
+import sys
 from pathlib import Path
+
+# Ajout du dossier racine au sys.path pour permettre les imports de 'common'
+root_path = Path(__file__).resolve().parents[1]
+if str(root_path) not in sys.path:
+    sys.path.insert(0, str(root_path))
+
 from datetime import datetime, timedelta
 from conso_api_tools.api_client import fetch_and_archive
 from conso_api_tools import config

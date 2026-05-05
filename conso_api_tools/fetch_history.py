@@ -16,7 +16,14 @@ jusqu’à la veille du jour courant.
     python conso_api_tools/fetch_history.py
 """
 
+import sys
 from pathlib import Path
+
+# Ajout du dossier racine au sys.path pour permettre les imports de 'common'
+root_path = Path(__file__).resolve().parents[1]
+if str(root_path) not in sys.path:
+    sys.path.insert(0, str(root_path))
+
 from datetime import datetime, timedelta
 
 from conso_api_tools.config import FOLDER_30MIN, FOLDER_1H

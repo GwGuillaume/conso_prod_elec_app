@@ -16,13 +16,20 @@ Fonctionnalités :
     python prod_api_tools/fetch_history.py
 """
 
+import sys
+from pathlib import Path
+
+# Ajout du dossier racine au sys.path pour permettre les imports de 'common'
+root_path = Path(__file__).resolve().parents[1]
+if str(root_path) not in sys.path:
+    sys.path.insert(0, str(root_path))
+
 from os import getenv
 from datetime import datetime, timedelta
-from common.utils import  format_date_to_str, print_section, cleanup_folders
+from common.utils import format_date_to_str, print_section, cleanup_folders, yesterday
 from prod_api_tools.config import SITE_ID, ARCHIVE_FILE, CSV_30MIN, CSV_1H, RAW_FOLDER
 from prod_api_tools.api_client import fetch_and_archive, _current_token, refresh_token
 from common.config import START_DATE
-from common.utils import yesterday
 
 
 if _current_token() is None:
