@@ -37,24 +37,34 @@ def fetch_all_missing_data(start_date: datetime = START_DATE):
 
     Paramètre :
         start_date (datetime) : date de début (incluse)
+    
+    Retour :
+        None 
     """
     print_section(f"📡 Téléchargement de l’historique Conso API depuis le {format_date_to_str(start_date)}")
     date_incr = start_date
+
     while date_incr <= yesterday():
-        date_str = format_date_to_str(date_incr)
+        date_str = format_date_to_str(date_obj = date_incr)
         print(f"\n📅 Traitement du {date_str}...")
         # 1h
-        new_1h = fetch_and_archive(date_incr, interval="1h")
+        new_1h = fetch_and_archive(
+            date_obj = date_incr, 
+            interval = "1h")
         # 30min
-        new_30min = fetch_and_archive(date_incr, interval="30min")
+        new_30min = fetch_and_archive(
+            date_obj = date_incr, 
+            interval = "30min")
         # Incrémentation d'une journée
         date_incr = date_incr + timedelta(days=1)
+    
     # Suppression des dossiers temporaires
     tmp_folders = [Path(FOLDER_1H), Path(FOLDER_30MIN)]
     cleanup_folders(tmp_folders)
+
     print("📦 Historique de consommation mis à jour.")
 
 
 if __name__ == "__main__":
     # Téléchargement des données depuis START_DATE jusqu'à hier
-    fetch_all_missing_data(START_DATE)
+    fetch_all_missing_data(start_date = START_DATE)

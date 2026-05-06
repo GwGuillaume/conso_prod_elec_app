@@ -31,7 +31,7 @@ def main():
     # 🕒 Préparation
     # -------------------------------
     yesterday = datetime.now() - timedelta(days=1)
-    date_str = format_date_to_str(yesterday)
+    date_str = format_date_to_str(date_obj = yesterday)
 
     print_section(f"📆 Mise à jour quotidienne de la production ({date_str})")
 
@@ -40,12 +40,17 @@ def main():
     # -------------------------------
     print(f"⚡ Vérification des données de production pour le {date_str}...")
 
-    downloaded = fetch_and_archive(yesterday, SITE_ID, ARCHIVE_FILE, CSV_30MIN, CSV_1H)
+    downloaded = fetch_and_archive(
+        target_date = yesterday, 
+        site_id = SITE_ID, 
+        archive_path = ARCHIVE_FILE, 
+        csv_path_30min = CSV_30MIN, 
+        csv_path_1h = CSV_1H)
 
     # -------------------------------
     # 🧹 Nettoyage des dossiers temporaires
     # -------------------------------
-    cleanup_folders([RAW_FOLDER])
+    cleanup_folders(folder_paths = [RAW_FOLDER])
 
 
     # -------------------------------

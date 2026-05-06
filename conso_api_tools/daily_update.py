@@ -30,7 +30,7 @@ def main():
     # 🕒 Préparation
     # -------------------------------
     yesterday = datetime.now() - timedelta(days=1)
-    date_str = format_date_to_str(yesterday)
+    date_str = format_date_to_str(date_obj = yesterday)
 
     print_section(f"📆 Mise à jour quotidienne des données Conso API ({date_str})")
 
@@ -40,7 +40,9 @@ def main():
     # ⚙️ Téléchargement 1h
     # -------------------------------
     print(f"⚡ Vérification des données 1h pour le {date_str}...")
-    new_1h = fetch_and_archive(yesterday, interval="1h")
+    new_1h = fetch_and_archive(
+        date_obj = yesterday, 
+        interval = "1h")
     if new_1h:
         downloaded = True
 
@@ -48,14 +50,17 @@ def main():
     # ⚙️ Téléchargement 30min
     # -------------------------------
     print(f"⚡ Vérification des données 30min pour le {date_str}...")
-    new_30 = fetch_and_archive(yesterday, interval="30min")
+    new_30 = fetch_and_archive(
+        date_obj = yesterday, 
+        interval = "30min")
     if new_30:
         downloaded = True
 
     # -------------------------------
     # 🧹 Nettoyage des dossiers temporaires
     # -------------------------------
-    tmp_folders = [Path(config.FOLDER_1H), Path(config.FOLDER_30MIN)]
+    tmp_folders = [Path(config.FOLDER_1H), 
+                   Path(config.FOLDER_30MIN)]
     cleanup_folders(tmp_folders)
 
     # -------------------------------

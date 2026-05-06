@@ -23,10 +23,10 @@ from app.core.data_manager import load_merged_data
 # ---------------------------------------------------------------------
 st.set_page_config(
 
-    page_title="Suivi de la consommation et de la production électrique ⚡️",
-    layout="wide",
-    page_icon="🔋",
-    initial_sidebar_state="expanded",
+    page_title = "Suivi de la consommation et de la production électrique ⚡️",
+    layout = "wide",
+    page_icon = "🔋",
+    initial_sidebar_state = "expanded",
 )
 
 # ------------------------------------------------------------------
@@ -48,7 +48,7 @@ def main():
     status_box = st.empty()  # crée une zone qui pourra être remplacée
     status_box.info("📥 Chargement et fusion des données...")
 
-    with st.spinner("🔄 Traitement en cours..."):
+    with st.spinner(text = "🔄 Traitement en cours..."):
         try:
             # Fusion des données de consommation et de production
             merged_df = load_merged_data()
@@ -61,13 +61,13 @@ def main():
                                    locale="fr")
             # Remplacement du message bleu par un message vert
             status_msg = f"✅ Données du {min_date} au {max_date} chargées et fusionnées avec succès !"
-            status_box.success(status_msg)
+            status_box.success(body = status_msg)
         except Exception as e:
             status_box.error(f"❌ Erreur lors du chargement ou de la fusion des données : {e}")
             return
 
     # --- Rendu principal de l'application ---
-    render_app(merged_df)
+    render_app(df = merged_df)
 
 
 if __name__ == "__main__":
