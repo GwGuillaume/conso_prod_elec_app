@@ -23,22 +23,39 @@ if str(root_path) not in sys.path:
 from datetime import datetime, timedelta
 from prod_api_tools.config import SITE_ID, ARCHIVE_FILE, CSV_30MIN, CSV_1H, RAW_FOLDER
 from prod_api_tools.api_client import fetch_and_archive
-from common.file_utils import cleanup_folders
-from common.utils import print_section, format_date
+from common.utils import print_section, format_date_to_str, cleanup_folders
 
 
 def main():
+    # -------------------------------
+    # 🕒 Préparation
+    # -------------------------------
     yesterday = datetime.now() - timedelta(days=1)
-    print_section(f"☀️ Mise à jour quotidienne de la production ({format_date(yesterday)})")
+    date_str = format_date_to_str(yesterday)
+
+    print_section(f"📆 Mise à jour quotidienne de la production ({date_str})")
+
+    # -------------------------------
+    # ⚙️ Telechargement
+    # -------------------------------
+    print(f"⚡ Vérification des données de production pour le {date_str}...")
 
     downloaded = fetch_and_archive(yesterday, SITE_ID, ARCHIVE_FILE, CSV_30MIN, CSV_1H)
+
+    # -------------------------------
+    # 🧹 Nettoyage des dossiers temporaires
+    # -------------------------------
     cleanup_folders([RAW_FOLDER])
 
-    print_section("✅ Récapitulatif")
+
+    # -------------------------------
+    # ✅ Récapitulatif
+    # -------------------------------
+    print_section("✅ Résumé du téléchargement quotidien des données de production")
     if downloaded:
-        print(f"📊 Données de production mises à jour pour {format_date(yesterday)}")
+        print(f"📊 Données de production mises à jour pour le {date_str}")
     else:
-        print(f"📦 Aucune nouvelle donnée à télécharger pour {format_date(yesterday)}")
+        print(f"📦 Aucune nouvelle donnée à télécharger pour le {date_str}")
     print("🧹 Dossiers temporaires nettoyés.")
     print("🏁 Script daily_update.py terminé.")
 

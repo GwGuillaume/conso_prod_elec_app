@@ -61,7 +61,7 @@ def main():
     # -------------------------------
     # ✅ Récapitulatif
     # -------------------------------
-    print_section("✅ Résumé du téléchargement quotidien")
+    print_section("✅ Résumé du téléchargement quotidien des données de consommation")
     if downloaded:
         print(f"📊 Données mises à jour pour le {date_str}")
     else:
