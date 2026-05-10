@@ -27,7 +27,9 @@ def normalize_datetime_column(df: pd.DataFrame, col: str = "datetime") -> pd.Dat
     """
     df = df.copy()
     if col in df.columns:
-        df[col] = pd.to_datetime(df[col], errors="coerce")
+        df[col] = pd.to_datetime(
+            arg = df[col], 
+            errors = "coerce")
     return df
 
 

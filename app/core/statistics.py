@@ -38,11 +38,21 @@ def compute_summary(df: pd.DataFrame) -> dict:
     ratio_surplus = ((total_prod - total_conso) / total_prod * 100) if total_prod else 0
 
     return {
-        "total_conso_kWh": round(total_conso / 1000, 2),
-        "total_prod_kWh": round(total_prod / 1000, 2),
-        "total_energy_kWh": round(total_energy / 1000, 2),
-        "autoconsommation_%": round(ratio_autoconso, 2),
-        "surplus_%": round(ratio_surplus, 2)
+        "total_conso_kWh": round(
+            number = total_conso / 1000, 
+            ndigits = 2),
+        "total_prod_kWh": round(
+            number = total_prod / 1000, 
+            ndigits = 2),
+        "total_energy_kWh": round(
+            number = total_energy / 1000, 
+            ndigits = 2),
+        "autoconsommation_%": round(
+            number = ratio_autoconso, 
+            ndigits = 2),
+        "surplus_%": round(
+            number = ratio_surplus, 
+            ndigits = 2)
     }
 
 def get_summary_info(df: pd.DataFrame, mode: str) -> str:
@@ -59,7 +69,9 @@ def get_summary_info(df: pd.DataFrame, mode: str) -> str:
     """
     # la fonction print_general_info de common.data_tools renvoie déjà un texte formaté
     try:
-        info = dt.print_general_info(mode, df)
+        info = dt.print_general_info(
+            display_mode = mode, 
+            df = df)
     except Exception:
         # fallback minimal si la fonction n'existe pas ou échoue
         info = (
@@ -80,8 +92,10 @@ def compute_daily_average(df: pd.DataFrame) -> pd.DataFrame:
     Retour :
         pd.DataFrame : tableau des moyennes par jour.
     """
-    df_daily = df.resample("D", on="datetime").sum(numeric_only=True)
-    return df_daily[["conso", "prod", "total"]].round(2)
+    df_daily = df.resample(
+        rule = "D", 
+        on = "datetime").sum(numeric_only = True)
+    return df_daily[["conso", "prod", "total"]].round(decimals = 2)
 
 
 # ---------------------------------------------------------------
@@ -116,8 +130,11 @@ def compute_basic_stats(df: pd.DataFrame) -> pd.DataFrame:
         ("Énergie totale (kWh)", summary["total_energy_kWh"]),
         ("Autoconsommation (%)", summary["autoconsommation_%"]),
         ("Surplus de production (%)", summary["surplus_%"]),
-        ("Durée analysée (jours)", (df["datetime"].max() - df["datetime"].min()).days + 1),
+        ("Durée analysée (jours)", (df["datetime"].max() - 
+                                    df["datetime"].min()).days + 1),
     ]
 
-    stats_df = pd.DataFrame(data, columns=["Indicateur", "Valeur"])
+    stats_df = pd.DataFrame(
+        data = data, 
+        columns = ["Indicateur", "Valeur"])
     return stats_df

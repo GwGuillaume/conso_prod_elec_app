@@ -19,12 +19,21 @@ def format_date_fr(d: datetime | date, pattern="d MMMM y"):
     """
     # Si c'est un datetime
     if isinstance(d, datetime):
-        return format_datetime(d, format=pattern, locale="fr")
+        return format_datetime(
+            datetime = d, 
+            format = pattern, 
+            locale = "fr")
 
     # Si c'est une date : conversion en datetime (minuit)
     if isinstance(d, date):
-        d = datetime(d.year, d.month, d.day)
-        return format_datetime(d, format=pattern, locale="fr")
+        d = datetime(
+            year = d.year, 
+            month = d.month, 
+            day = d.day)
+        return format_datetime(
+            datetime = d, 
+            format = pattern, 
+            locale = "fr")
 
     # Sinon renvoyer tel quel
     return d

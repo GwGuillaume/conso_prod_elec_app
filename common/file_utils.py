@@ -19,7 +19,6 @@ from typing import List
 # 📁 Gestion de dossiers et fichiers
 # ------------------------------------------------------
 
-
 # ------------------------------------------------------
 # 🧾 Gestion des fichiers CSV
 # ------------------------------------------------------
@@ -36,11 +35,18 @@ def append_dicts_to_csv(rows: list[dict], csv_path: Path):
     if not rows:
         return
 
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(
+        data = rows)
     if csv_path.exists():
-        df.to_csv(csv_path, mode="a", index=False, header=False)
+        df.to_csv(
+            path_or_buf = csv_path, 
+            mode = "a", 
+            index = False, 
+            header = False)
     else:
-        df.to_csv(csv_path, index=False)
+        df.to_csv(
+            path_or_buf = csv_path, 
+            index = False)
     print(f"🧾 Données ajoutées à {csv_path}")
 
 
@@ -60,13 +66,20 @@ def load_clean_data(csv_filepath: Path) -> pd.DataFrame:
     """
     if not csv_filepath.exists():
         raise FileNotFoundError(f"🚫 Le fichier {csv_filepath} est introuvable.")
-    df = pd.read_csv(csv_filepath, sep=";")
-    df["datetime"] = pd.to_datetime(df["datetime"], errors="coerce")
+    df = pd.read_csv(
+        filepath_or_buffer = csv_filepath, 
+        sep = ";")
+    df["datetime"] = pd.to_datetime(
+        arg = df["datetime"], 
+        errors = "coerce")
     # conversion automatique des autres colonnes en numérique
     for col in df.columns:
         if col != "datetime":
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-    df = df.sort_values("datetime").reset_index(drop=True)
+            df[col] = pd.to_numeric(
+                arg = df[col], 
+                errors = "coerce")
+    df = df.sort_values(
+                by = "datetime").reset_index(drop = True)
     return df
 
 # ------------------------------------------------------
@@ -81,7 +94,8 @@ def safe_delete(file_path: Path):
         file_path (Path) : chemin du fichier à supprimer
     """
     try:
-        file_path.unlink(missing_ok=True)
+        file_path.unlink(
+            missing_ok = True)
         print(f"🧹 Fichier supprimé : {file_path}")
     except Exception as e:
         print(f"⚠️ Impossible de supprimer {file_path} : {e}")

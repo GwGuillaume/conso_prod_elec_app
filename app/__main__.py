@@ -14,7 +14,8 @@ import sys
 def main():
     app_path = Path(__file__).parent.joinpath("main.py")
     cmd = [sys.executable, "-m", "streamlit", "run", app_path]
-    subprocess.run(args = cmd)
+    subprocess.run(
+        args = cmd)
 
 
 if __name__ == "__main__":

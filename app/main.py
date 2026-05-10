@@ -52,22 +52,31 @@ def main():
         try:
             # Fusion des données de consommation et de production
             merged_df = load_merged_data()
+
             # Récupération automatique des dates min/max
-            min_date = format_date(date=merged_df["datetime"].min(),
-                                   format="EEEE d MMMM y",
-                                   locale="fr")
-            max_date = format_date(date=merged_df["datetime"].max(),
-                                   format="EEEE d MMMM y",
-                                   locale="fr")
+            min_date = format_date(
+                date = merged_df["datetime"].min(),
+                format = "EEEE d MMMM y",
+                locale = "fr")
+            max_date = format_date(
+                date = merged_df["datetime"].max(),
+                format = "EEEE d MMMM y",
+                locale = "fr")
+            
             # Remplacement du message bleu par un message vert
             status_msg = f"✅ Données du {min_date} au {max_date} chargées et fusionnées avec succès !"
-            status_box.success(body = status_msg)
+
+            # Affichage du message vert
+            status_box.success(
+                body = status_msg)
         except Exception as e:
-            status_box.error(f"❌ Erreur lors du chargement ou de la fusion des données : {e}")
+            status_box.error(
+                body = f"❌ Erreur lors du chargement ou de la fusion des données : {e}")
             return
 
     # --- Rendu principal de l'application ---
-    render_app(df = merged_df)
+    render_app(
+        df = merged_df)
 
 
 if __name__ == "__main__":

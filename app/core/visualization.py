@@ -58,29 +58,32 @@ def make_timeseries_trace(
         # Largeur par défaut des barres temporelles (en ms)
         bar_width = 30 * 60 * 1000  # 30 minutes
         trace = go.Bar(
-            x=x,
-            y=y,
-            name=name,
-            visible=visible,
-            hovertemplate=hovertemplate,
-            customdata=customdata,
-            width=bar_width
+            x = x,
+            y = y,
+            name = name,
+            visible = visible,
+            hovertemplate = hovertemplate,
+            customdata = customdata,
+            width = bar_width
         )
     else:
         # Courbe par défaut
         trace = go.Scatter(
-            x=x,
-            y=y,
-            name=name,
-            mode=mode,
-            visible=visible,
-            hovertemplate=hovertemplate,
-            customdata=customdata,
-            line=dict(dash=line_dash or "solid", width=line_width),
+            x = x,
+            y = y,
+            name = name,
+            mode = mode,
+            visible = visible,
+            hovertemplate = hovertemplate,
+            customdata = customdata,
+            line = dict(
+                dash = line_dash or "solid", 
+                width = line_width),
         )
 
     if yaxis:
-        trace.update(yaxis=yaxis)
+        trace.update(
+            yaxis = yaxis)
 
     return trace
 
@@ -118,75 +121,111 @@ def plot_production_vs_consumption(
     """
     if df.empty:
         return go.Figure()
-    df_local = normalize_datetime_column(df, "datetime")
-    df_local["datetime_fr"] = df_local["datetime"].apply(lambda d: format_date_fr(d, pattern="d MMMM y HH:mm"))
+    df_local = normalize_datetime_column(
+        df = df, 
+        col = "datetime")
+    df_local["datetime_fr"] = df_local["datetime"].apply(lambda d: format_date_fr(
+        d = d, 
+        pattern = "d MMMM y HH:mm"))
 
     fig = go.Figure()
 
     if "consommation" in df_local.columns:
         fig.add_trace(
             make_timeseries_trace(
-                x=df_local["datetime"],
-                y=df_local["consommation"],
-                name="Consommation",
-                hovertemplate="%{customdata}<br>Consommation : %{y:.0f}<extra></extra>",
-                customdata=df_local["datetime_fr"],
-                line_dash="solid",
-                line_width=2,
-                chart_type=chart_type
+                x = df_local["datetime"],
+                y = df_local["consommation"],
+                name = "Consommation",
+                hovertemplate = "%{customdata}<br>Consommation : %{y:.0f}<extra></extra>",
+                customdata = df_local["datetime_fr"],
+                line_dash = "solid",
+                line_width = 2,
+                chart_type = chart_type
             )
         )
 
     if "production" in df_local.columns:
         fig.add_trace(
             make_timeseries_trace(
-                x=df_local["datetime"],
-                y=df_local["production"],
-                name="Production",
-                hovertemplate="%{customdata}<br>Production : %{y:.0f}<extra></extra>",
-                customdata=df_local["datetime_fr"],
-                line_dash="solid",
-                line_width=2,
-                chart_type=chart_type
+                x = df_local["datetime"],
+                y = df_local["production"],
+                name = "Production",
+                hovertemplate = "%{customdata}<br>Production : %{y:.0f}<extra></extra>",
+                customdata = df_local["datetime_fr"],
+                line_dash = "solid",
+                line_width = 2,
+                chart_type = chart_type
             )
         )
 
     if "total" in df_local.columns and df_local["total"].notna().any():
         fig.add_trace(
             make_timeseries_trace(
-                x=df_local["datetime"],
-                y=df_local["total"],
-                name="Total (prod + conso)",
-                hovertemplate="%{customdata}<br>Total : %{y:.0f}<extra></extra>",
-                customdata=df_local["datetime_fr"],
-                line_dash="solid",
-                line_width=2,
-                chart_type=chart_type
+                x = df_local["datetime"],
+                y = df_local["total"],
+                name = "Total (prod + conso)",
+                hovertemplate = "%{customdata}<br>Total : %{y:.0f}<extra></extra>",
+                customdata = df_local["datetime_fr"],
+                line_dash = "solid",
+                line_width = 2,
+                chart_type = chart_type
             )
         )
 
     title = f"Consommation vs Production — {mode}"
     fig.update_layout(
-        template=PLOT_THEME if hasattr(PLOT_THEME, "__str__") else "plotly_white",
-        title=dict(text=title, x=0.01, xanchor="left"),
-        xaxis=dict(title="Date", showgrid=True,
-                   rangeselector=dict(
-                       buttons=list([
-                           dict(count=1, label="1d", step="day", stepmode="backward"),
-                           dict(count=7, label="7d", step="day", stepmode="backward"),
-                           dict(count=30, label="30d", step="day", stepmode="backward"),
-                           dict(step="all")
-                       ])
+        template = PLOT_THEME if hasattr(PLOT_THEME, "__str__") else "plotly_white",
+        title = dict(
+            text = title, 
+            x = 0.01, 
+            xanchor = "left"),
+        xaxis = dict(
+            title = "Date", 
+            showgrid = True,
+            rangeselector = dict(
+                buttons = list([
+                    dict(
+                        count = 1, 
+                        label = "1d", 
+                        step = "day", 
+                        stepmode = "backward"),
+                    dict(
+                        count = 7, 
+                        label = "7d", 
+                        step = "day", 
+                        stepmode = "backward"),
+                    dict(
+                        count = 30, 
+                        label = "30d", 
+                        step = "day", 
+                        stepmode = "backward"),
+                    dict(
+                        step = "all"
+                    )
+                ])
                    ),
-                   rangeslider=dict(visible=True)),
-        yaxis=dict(title="Puissance / Energie", autorange=True),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        margin=dict(l=60, r=20, t=60, b=60),
-        hovermode="x unified"
+                   rangeslider = dict(
+                       visible = True)),
+        yaxis = dict(
+            title = "Puissance / Energie", 
+            autorange = True),
+        legend = dict(
+            orientation = "h",  
+            xanchor = "right", 
+            x = 1, 
+            yanchor = "bottom",  
+            y = 1.02),
+        margin = dict(
+            l = 60, 
+            r = 20, 
+            t = 60, 
+            b=60),
+        hovermode = "x unified"
         )
 
     if chart_type == "Histogramme":
-        fig.update_layout(barmode="group")
+        fig.update_layout(
+            barmode = "group")
 
     return fig
 
@@ -222,64 +261,81 @@ def build_multi_period_figure(
     if df.empty:
         return go.Figure()
 
-    df_local = normalize_datetime_column(df, "datetime")
+    df_local = normalize_datetime_column(
+        df = df, 
+        col = "datetime")
     # Indexation sur datetime
-    df_local = df_local.set_index(df_local["datetime"])
-    df_local["datetime_fr"] = df_local["datetime"].apply(lambda d: format_date_fr(d, pattern="d MMMM y HH:mm"))
-    agg = df_local[["production", "consommation"]].resample(freq).sum(min_count=1).fillna(0)
+    df_local = df_local.set_index(
+        keys = df_local["datetime"])
+    df_local["datetime_fr"] = df_local["datetime"].apply(lambda d: format_date_fr(
+        d = d, 
+        pattern = "d MMMM y HH:mm"))
+    
+    agg = df_local[["production", "consommation"]].resample(
+        rule = freq).sum(min_count = 1).fillna(0)
     agg["total"] = agg["production"] + agg["consommation"]
     agg = agg.reset_index()
 
     if freq == "W":
         agg["period_fr"] = agg["datetime"].apply(
-            lambda d: f"Semaine du {format_date_fr(d, 'd MMMM')} "
-                      f"au {format_date_fr(d + pd.Timedelta(days=6), 'd MMMM y')}")
+            lambda d: f"Semaine du {format_date_fr(
+                                        d = d, 
+                                        pattern = 'd MMMM')} "
+                      f"au {format_date_fr(
+                                        d = d + pd.Timedelta(days = 6), 
+                                        pattern = 'd MMMM y')}")
     else:
         agg["period_fr"] = agg["datetime"].apply(
-            lambda d: f"Mois de {format_date_fr(d, 'LLLL y')}")
+            lambda d: f"Mois de {format_date_fr(
+                d = d, 
+                pattern = 'LLLL y')}")
 
     fig = go.Figure()
     fig.add_trace(
         make_timeseries_trace(
-            x=agg["datetime"],
-            y=agg["consommation"],
-            name="Consommation",
-            hovertemplate="%{customdata}<br>Consommation : %{y:.0f}<extra></extra>",
-            customdata=agg["period_fr"],
-            chart_type=chart_type
+            x = agg["datetime"],
+            y = agg["consommation"],
+            name = "Consommation",
+            hovertemplate = "%{customdata}<br>Consommation : %{y:.0f}<extra></extra>",
+            customdata = agg["period_fr"],
+            chart_type = chart_type
         )
     )
     fig.add_trace(
         make_timeseries_trace(
-            x=agg["datetime"],
-            y=agg["production"],
-            name="Production",
-            hovertemplate="%{customdata}<br>Production : %{y:.0f}<extra></extra>",
-            customdata=agg["period_fr"],
-            chart_type=chart_type
+            x = agg["datetime"],
+            y = agg["production"],
+            name = "Production",
+            hovertemplate = "%{customdata}<br>Production : %{y:.0f}<extra></extra>",
+            customdata = agg["period_fr"],
+            chart_type = chart_type
         )
     )
     fig.add_trace(
         make_timeseries_trace(
-            x=agg["datetime"],
-            y=agg["total"],
-            name="Total",
-            hovertemplate="%{customdata}<br>Total : %{y:.0f}<extra></extra>",
-            customdata=agg["period_fr"],
-            chart_type=chart_type
+            x = agg["datetime"],
+            y = agg["total"],
+            name = "Total",
+            hovertemplate = "%{customdata}<br>Total : %{y:.0f}<extra></extra>",
+            customdata = agg["period_fr"],
+            chart_type = chart_type
         )
     )
 
     freq_label = "W" if freq == "W" else "ME"
     fig.update_layout(
-        template=PLOT_THEME if hasattr(PLOT_THEME, "__str__") else "plotly_white",
-        title=f"Agrégation périodique ({freq_label})",
-        xaxis_title="Période",
-        yaxis_title="Énergie",
-        hovermode="x unified",
-        legend=dict(orientation="h", y=1.02, x=0.01))
+        template = PLOT_THEME if hasattr(PLOT_THEME, "__str__") else "plotly_white",
+        title = f"Agrégation périodique ({freq_label})",
+        xaxis_title = "Période",
+        yaxis_title = "Énergie",
+        hovermode = "x unified",
+        legend = dict(
+            orientation = "h", 
+            x = 0.01, 
+            y = 1.02))
 
     if chart_type == "Histogramme":
-        fig.update_layout(barmode="group")
+        fig.update_layout(
+            barmode = "group")
 
     return fig

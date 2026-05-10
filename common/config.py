@@ -12,4 +12,7 @@ from datetime import datetime
 ROOT_PATH = Path(__file__).resolve().parents[1]
 
 # Date de départ
-START_DATE = datetime(2025, 3, 25)
+START_DATE = datetime(
+    year = 2025, 
+    month = 3, 
+    day = 25)

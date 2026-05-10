@@ -27,4 +27,8 @@ def apply_theme():
     .main .block-container { padding-top: 1rem; padding-left: 1rem; padding-right: 1rem; }
     </style>
     """
-    st.markdown(css, unsafe_allow_html=True)
+
+    # Injection du CSS personnalisé
+    st.markdown(
+        body = css, 
+        unsafe_allow_html = True)

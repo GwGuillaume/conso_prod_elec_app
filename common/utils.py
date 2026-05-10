@@ -37,7 +37,9 @@ def format_str_to_date(date_str: str) -> datetime:
     Retour :
         datetime : date formatée
     """
-    return datetime.strptime(date_str, "%Y-%m-%d")
+    return datetime.strptime(
+        date_str = date_str, 
+        format = "%Y-%m-%d")
 
 def yesterday() -> datetime:
     """
@@ -47,9 +49,13 @@ def yesterday() -> datetime:
         date_obj (datetime) : date d'hier
     """
     today = datetime.now().date()
-    yesterday_date = today - timedelta(days=1)
-    yesterday_time = time(0, 0)
-    return datetime.combine(yesterday_date, yesterday_time)
+    yesterday_date = today - timedelta(days = 1)
+    yesterday_time = time(
+        hour = 0, 
+        minute = 0)
+    return datetime.combine(
+        date = yesterday_date, 
+        time = yesterday_time)
 
 def next_day(current_day: datetime) -> datetime:
     """
@@ -98,7 +104,9 @@ def ensure_folder(folder_path: str | Path):
         folder_path (str | Path) : chemin du dossier à créer
     """
     path = Path(folder_path)
-    path.mkdir(parents=True, exist_ok=True)
+    path.mkdir(
+        parents = True, 
+        exist_ok = True)
     return path
 
 def cleanup_folders(folder_paths: list):
@@ -126,10 +134,18 @@ def save_json(data: dict, date_str: str, interval_folder: str) -> Path:
     Retour :
         Path : chemin complet du fichier sauvegardé
     """
-    ensure_folder(interval_folder)
+    ensure_folder(
+        folder_path = interval_folder)
     file_path = Path(interval_folder) / f"conso_{date_str}.json"
-    with open(file_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    with open(
+        file = file_path, 
+        mode = "w", 
+        encoding = "utf-8") as f:
+        json.dump(
+            obj = data, 
+            fp = f, 
+            ensure_ascii = False, 
+            indent = 2)
     return file_path
 
 def clean_csv_columns(source_csv: Path, columns_map: dict) -> Path:
@@ -161,7 +177,8 @@ def clean_csv_columns(source_csv: Path, columns_map: dict) -> Path:
     """
 
     # Lecture du CSV original
-    df = pd.read_csv(source_csv)
+    df = pd.read_csv(
+        filepath_or_buffer = source_csv)
 
     # Validation des colonnes
     missing = [col for col in columns_map.keys() if col not in df.columns]
@@ -171,10 +188,13 @@ def clean_csv_columns(source_csv: Path, columns_map: dict) -> Path:
         )
 
     # Sélection et renommage
-    df_clean = df[list(columns_map.keys())].rename(columns=columns_map)
+    df_clean = df[list(columns_map.keys())].rename(columns = columns_map)
 
     # Écrasement du fichier source
-    df_clean.to_csv(source_csv, sep=";", index=False)
+    df_clean.to_csv(
+        filepath_or_buf = source_csv, 
+        sep = ";", 
+        index = False)
 
     return source_csv
 
@@ -208,11 +228,17 @@ def append_csvs_with_resampling(csv_paths: list[Path],
     # -----------------------------------------------------------
     dfs = []
     for p in csv_paths:
-        df = pd.read_csv(p, sep=";")
-        df["datetime"] = pd.to_datetime(df["datetime"])
-        dfs.append(df)
+        df = pd.read_csv(
+            filepath_or_buffer = p, 
+            sep = ";")
+        df["datetime"] = pd.to_datetime(
+                                arg = df["datetime"])
+        dfs.append(
+            object = df)
 
-    df_new = pd.concat(dfs, ignore_index=True)
+    df_new = pd.concat(
+        objs = dfs, 
+        ignore_index = True)
     df_new = df_new.set_index("datetime").sort_index()
 
     # -----------------------------------------------------------
@@ -220,13 +246,13 @@ def append_csvs_with_resampling(csv_paths: list[Path],
     # -----------------------------------------------------------
     df_new_30min = (
         df_new.resample("30min")
-        .mean(numeric_only=True)
+        .mean(numeric_only = True)
         .dropna()
     )
 
     df_new_1h = (
         df_new.resample("1h")
-        .mean(numeric_only=True)
+        .mean(numeric_only = True)
         .dropna()
     )
     df_new_1h = df_new_1h[df_new_1h.index.minute == 0]
@@ -237,20 +263,30 @@ def append_csvs_with_resampling(csv_paths: list[Path],
 
     # ---- 30 min ----
     if csv_30min.exists():
-        df_old_30 = pd.read_csv(csv_30min, sep=";", parse_dates=["datetime"])
+        df_old_30 = pd.read_csv(
+            filepath_or_buffer = csv_30min, 
+            sep = ";", 
+            parse_dates = ["datetime"])
         df_old_30 = df_old_30.set_index("datetime")
-        df_30 = pd.concat([df_old_30, df_new_30min])
-        df_30 = df_30[~df_30.index.duplicated(keep='last')]  # supprime doublons
+        df_30 = pd.concat(
+            objs = [df_old_30, df_new_30min], 
+            ignore_index = True)
+        df_30 = df_30[~df_30.index.duplicated(keep = 'last')]  # supprime doublons
         df_30 = df_30.sort_index()
     else:
         df_30 = df_new_30min
 
     # ---- 1 heure ----
     if csv_1h.exists():
-        df_old_1h = pd.read_csv(csv_1h, sep=";", parse_dates=["datetime"])
+        df_old_1h = pd.read_csv(
+            filepath_or_buffer = csv_1h, 
+            sep = ";", 
+            parse_dates = ["datetime"])
         df_old_1h = df_old_1h.set_index("datetime")
-        df_1h_final = pd.concat([df_old_1h, df_new_1h])
-        df_1h_final = df_1h_final[~df_1h_final.index.duplicated(keep='last')]
+        df_1h_final = pd.concat(
+            objs = [df_old_1h, df_new_1h], 
+            ignore_index = True)
+        df_1h_final = df_1h_final[~df_1h_final.index.duplicated(keep = 'last')]
         df_1h_final = df_1h_final.sort_index()
     else:
         df_1h_final = df_new_1h
@@ -258,8 +294,14 @@ def append_csvs_with_resampling(csv_paths: list[Path],
     # -----------------------------------------------------------
     # 4) Sauvegarde finale
     # -----------------------------------------------------------
-    df_30.to_csv(csv_30min, sep=";", index_label="datetime")
-    df_1h_final.to_csv(csv_1h, sep=";", index_label="datetime")
+    df_30.to_csv(
+        path_or_buf = csv_30min, 
+        sep = ";", 
+        index_label = "datetime")
+    df_1h_final.to_csv(
+        path_or_buf = csv_1h, 
+        sep = ";", 
+        index_label = "datetime")
 
     print(f"⏱️ Mise à jour du fichier 30 minutes : {csv_30min}")
     print(f"⏱️ Mise à jour du fichier 1 heure : {csv_1h}")
@@ -279,14 +321,24 @@ def append_csvs_to_clean_csv(csv_paths: list[Path], clean_csv: Path):
     """
     dfs = []
     for p in csv_paths:
-        dfs.append(pd.read_csv(p))
-    df_all = pd.concat(dfs, ignore_index=True)
+        dfs.append(pd.read_csv(
+            filepath_or_buffer = p, 
+            sep = ";"))
+    df_all = pd.concat(
+        objs = dfs, 
+        ignore_index = True)
 
     if clean_csv.exists():
-        df_existing = pd.read_csv(clean_csv)
-        df_all = pd.concat([df_existing, df_all], ignore_index=True)
+        df_existing = pd.read_csv(
+            filepath_or_buffer = clean_csv, 
+            sep = ";")
+        df_all = pd.concat(
+            objs = [df_existing, df_all], 
+            ignore_index = True)
 
-    df_all.to_csv(clean_csv, index=False)
+    df_all.to_csv(
+        path_or_buf = clean_csv, 
+        index = False)
     print(f"🧾 Données ajoutées à {clean_csv}")
 
 
@@ -316,8 +368,11 @@ def resampled_data_exists_for_date(target_date: datetime,
         True si les données existent déjà, False sinon
     """
 
-    day_start = datetime.combine(target_date.date(), datetime.min.time())
-    expected_hours = [day_start + timedelta(hours=h) for h in range(24)]
+    day_start = datetime.combine(
+        date = target_date.date(), 
+        time = datetime.min.time())
+    expected_hours = [day_start + timedelta(
+                                    hours = h) for h in range(24)]
 
     # -----------------------------------------------------------
     # Vérification fichier 1h
@@ -325,7 +380,10 @@ def resampled_data_exists_for_date(target_date: datetime,
     if not csv_1h.exists():
         return False
 
-    df_1h = pd.read_csv(csv_1h, sep=";", parse_dates=["datetime"])
+    df_1h = pd.read_csv(
+        filepath_or_buffer = csv_1h, 
+        sep = ";", 
+        parse_dates = ["datetime"])
     df_day_1h = df_1h[(df_1h["datetime"].dt.date == target_date.date())]
 
     if df_day_1h.empty:
@@ -342,7 +400,10 @@ def resampled_data_exists_for_date(target_date: datetime,
     if not csv_30min.exists():
         return False
 
-    df_30 = pd.read_csv(csv_30min, sep=";", parse_dates=["datetime"])
+    df_30 = pd.read_csv(
+        filepath_or_buffer = csv_30min, 
+        sep = ";", 
+        parse_dates = ["datetime"])
     df_day_30 = df_30[(df_30["datetime"].dt.date == target_date.date())]
 
     if df_day_30.empty:
@@ -351,8 +412,10 @@ def resampled_data_exists_for_date(target_date: datetime,
     # Vérifier qu'il existe au moins une donnée par heure
     hours_with_data = set(df_day_30["datetime"].dt.hour)
 
-    expected_hours_set = set(range(24))
-    if not expected_hours_set.issubset(hours_with_data):
+    expected_hours_set = set(range(
+                                stop = 24))
+    if not expected_hours_set.issubset(
+                                s = hours_with_data):
         return False
 
     return True
@@ -375,7 +438,9 @@ def add_file_to_zip(tmp_file: Path, zip_path: Path, arcname: str):
                             - conso_1h/courbe_2025-03-25.json
     """
     with zipfile.ZipFile(zip_path, "a", zipfile.ZIP_DEFLATED) as zipf:
-        zipf.write(tmp_file, arcname=arcname)
+        zipf.write(
+            filename = tmp_file, 
+            arcname = arcname)
 
     print(f"📦 Fichier ajouté dans l’archive sous : {arcname}")
 
@@ -391,7 +456,9 @@ def extract_zip_file_list(zip_path: Path) -> list[str]:
     """
     if not zip_path.exists():
         return []
-    with zipfile.ZipFile(zip_path, "r") as zipf:
+    with zipfile.ZipFile(
+        file = zip_path, 
+        mode = "r") as zipf:
         return zipf.namelist()
 
 def read_csv_from_zip(zip_path: Path, zip_filename: str) -> pd.DataFrame:
@@ -422,19 +489,28 @@ def read_csv_from_zip(zip_path: Path, zip_filename: str) -> pd.DataFrame:
     if not zip_path.exists():
         raise FileNotFoundError(f"L'archive ZIP n'existe pas : {zip_path}")
 
-    with zipfile.ZipFile(zip_path, 'r') as z:
+    with zipfile.ZipFile(
+        file = zip_path, 
+        mode = 'r') as z:
         # Trouver le fichier CSV dans le ZIP
         csv_file = [f for f in z.namelist() if f==zip_filename]
 
         if not csv_file:
             raise ValueError(f"Le fichier {zip_filename} n'a pas été trouvé dans l'archive : {zip_path}")
 
-        with z.open(zip_filename) as csv_file:
+        with z.open(
+                name = zip_filename) as csv_file:
             try:
-                return pd.read_csv(csv_file, encoding='utf-8', sep=";")
+                return pd.read_csv(
+                    filepath_or_buffer = csv_file, 
+                    encoding = 'utf-8', 
+                    sep = ";")
             except UnicodeDecodeError:
                 # Tentative alternative automatique
-                return pd.read_csv(csv_file, encoding="latin-1", sep=";")
+                return pd.read_csv(
+                    filepath_or_buffer = csv_file, 
+                    encoding = "latin-1", 
+                    sep = ";")
 
 def check_json_in_archive(zip_path:Path, date_str: str, interval_folder: str) -> bool:
     """
@@ -448,7 +524,8 @@ def check_json_in_archive(zip_path:Path, date_str: str, interval_folder: str) ->
     Retour :
         bool : True si le fichier existe dans l'archive, False sinon
     """
-    zip_files = extract_zip_file_list(zip_path)
+    zip_files = extract_zip_file_list(
+                    zip_path = zip_path)
     json_name = f"{interval_folder}/courbe_{date_str}.json"
     return json_name in zip_files
 
@@ -463,12 +540,18 @@ def extract_csv_from_zip(zip_path: Path, dest_folder: Path) -> Path:
     Retour :
         chemin du CSV extrait
     """
-    with zipfile.ZipFile(zip_path, 'r') as zipf:
-        csv_names = [f for f in zipf.namelist() if f.lower().endswith('.csv')]
+    with zipfile.ZipFile(
+        file = zip_path, 
+        mode = 'r') as zipf:
+        csv_names = [f for f in zipf.namelist() 
+                     if f.lower().endswith(
+                                    suffix = '.csv')]
         if not csv_names:
             raise RuntimeError(f"Aucun CSV trouvé dans {zip_path}")
         csv_name = csv_names[0]
-        Path.mkdir(dest_folder, exist_ok=True)
-        zipf.extract(csv_name, path=dest_folder)
+        Path.mkdir(dest_folder, exist_ok = True)
+        zipf.extract(
+            member = csv_name, 
+            path = dest_folder)
         extracted_path = dest_folder.joinpath(csv_name)
     return extracted_path
