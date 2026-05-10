@@ -110,7 +110,7 @@ def render_app(df: pd.DataFrame) -> None:
 
     # ID unique basé sur le mode + borne de dates (utile pour éviter le rerun inutile)
     chart_key = f"plot_{mode}_{start_datetime.strftime('%Y%m%d%H%M')}_{end_datetime.strftime('%Y%m%d%H%M')}"
-    st.plotly_chart(figure_or_data=fig, use_container_width=True, key=chart_key)
+    st.plotly_chart(figure_or_data=fig, width='content', key=chart_key)
 
     # --- Affichage des détails horaires si demandé ---
     if show_detail:
@@ -151,10 +151,10 @@ def render_app(df: pd.DataFrame) -> None:
                 fig_detail = plot_production_vs_consumption(df_period, mode="Detail")
                 # clé unique par période pour assurer l'état
                 detail_key = f"detail_{mode}_{p.strftime('%Y%m%d')}"
-                st.plotly_chart(fig_detail, use_container_width=True, key=detail_key)
+                st.plotly_chart(fig_detail, width='content', key=detail_key)
 
     # --- Statistiques basiques ---
     if show_stats:
         st.markdown(body="### 📈 Statistiques sur la période sélectionnée")
         stats = compute_basic_stats(df=df_filtered)
-        st.dataframe(data=stats, use_container_width=True)
+        st.dataframe(data=stats, width='content')
