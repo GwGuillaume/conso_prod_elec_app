@@ -56,8 +56,8 @@ temp/
 #   PROJECT SPECIFIC
 # ===========================================================
 
-# Dossier de code à supprimer
-TO_DELETE/
+# Ancien fichier requirements
+requirements_full.txt
 
 # Dossier Intellij
 .idea/
