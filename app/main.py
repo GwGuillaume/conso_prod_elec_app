@@ -10,7 +10,9 @@ from pathlib import Path
 # Ajout du dossier racine au sys.path pour permettre les imports de 'common', 'conso_api_tools' et 'prod_api_tools'
 root_path = Path(__file__).resolve().parents[1]
 if str(root_path) not in sys.path:
-    sys.path.insert(0, str(root_path))
+    sys.path.insert(
+        index =  0, 
+        object = str(object = root_path))
 
 import streamlit as st
 from babel.dates import format_date
@@ -22,7 +24,6 @@ from app.core.data_manager import load_merged_data
 # ⚙️ Configuration initiale Streamlit (doit être appelée avant tout)
 # ---------------------------------------------------------------------
 st.set_page_config(
-
     page_title = "Suivi de la consommation et de la production électrique ⚡️",
     layout = "wide",
     page_icon = "🔋",

@@ -91,9 +91,11 @@ def render_app(df: pd.DataFrame) -> None:
         # Affichage conditionnel du multiselect pour les périodes si l'utilisateur choisit de voir les détails horaires
         choice = st.sidebar.selectbox(
             label = "Afficher le détail horaire pour :",
-            options = ["Aucun", "Toutes les périodes", 
-                     "Sélectionner des périodes"],
-            index = 0)
+            options = ["Aucun", 
+                       "Toutes les périodes", 
+                       "Sélectionner des périodes"],
+            index = 0, 
+            help = "Menue déroulant pour choisir d'afficher les détails horaires pour aucune, toutes ou certaines périodes spécifiques de la plage sélectionnée.",)
 
         # Activation de l'affichage des détails horaires si l'utilisateur choisit une option autre que "Aucun"
         if choice != "Aucun":
@@ -107,11 +109,13 @@ def render_app(df: pd.DataFrame) -> None:
                     body = "Aucune période disponible pour la plage sélectionnée.")
                 selected_periods = []
             else:
-                # multiselect avec format_func pour afficher des labels lisibles
+                # Affichage du multiselect pour choisir les périodes spécifiques
                 selected_periods = st.sidebar.multiselect(
                     label = "Choisissez une ou plusieurs périodes",
                     options = list(period_list),
-                    format_func = lambda x: period_labels[list(period_list).index(x)])
+                    format_func = lambda x: period_labels[list(period_list).index(x)], 
+                    placeholder = "Sélectionner une ou plusieurs périodes", 
+                    help = "Sélectionner une ou plusieurs périodes pour afficher les détails horaires correspondants")
 
     st.sidebar.markdown(body = "---")
     show_stats = st.sidebar.checkbox(

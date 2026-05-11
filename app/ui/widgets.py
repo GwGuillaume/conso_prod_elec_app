@@ -16,6 +16,10 @@ def select_mode() -> str:
     """
     Permet à l'utilisateur de choisir le mode d'affichage :
     Classique, Hebdomadaire, Mensuel ou Journée spécifique.
+
+    Retour :
+        mode : str
+            mode d'affichage choisi parmi "Classique", "Hebdomadaire", "Mensuel", "Journée spécifique"
     """
     mode = st.sidebar.selectbox(
         label = "Mode d'affichage",
@@ -23,7 +27,12 @@ def select_mode() -> str:
                    "Hebdomadaire",
                    "Mensuel",
                    "Journée spécifique"],
-        index = 0)
+        index = 0, 
+        help = "Choisir le mode d'affichage pour visualiser la consommation et la production électrique :\n\n"
+               "- **Classique** : sélectionnez une plage de dates et heures personnalisée.\n"
+               "- **Hebdomadaire** : affichez les données agrégées par semaine, avec possibilité de sélectionner une ou plusieurs semaines spécifiques.\n"
+               "- **Mensuel** : affichez les données agrégées par mois, avec possibilité de sélectionner un ou plusieurs mois spécifiques.\n"
+               "- **Journée spécifique** : sélectionnez une date précise et une plage horaire pour analyser une journée particulière.")
     return mode
 
 
@@ -46,7 +55,8 @@ def select_period(display_mode: str, df: pd.DataFrame):
                            pour extraire les bornes de dates disponibles
 
     Retour :
-        tuple(datetime, datetime, list, str) : bornes de la période sélectionnée, liste des périodes sélectionnées (pour Hebdo/Mensuel), type de période (W/M)
+        tuple(datetime, datetime, list, str) :
+            bornes de la période sélectionnée, liste des périodes sélectionnées (pour Hebdo/Mensuel), type de période (W/M)
     """
 
     min_date = df['datetime'].min().date()
@@ -177,6 +187,6 @@ def select_chart_type() -> str:
     chart_type = st.sidebar.selectbox(
         label = "Type de graphique",
         options = ["Courbe", "Histogramme"],
-        index = 0
-    )
+        index = 0, 
+        help = "Choisir entre une courbe temporelle classique ou un histogramme à barres pour visualiser la consommation et la production électrique.")
     return chart_type

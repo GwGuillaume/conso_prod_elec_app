@@ -29,7 +29,6 @@ def compute_summary(df: pd.DataFrame) -> dict:
     Retour :
         dict : dictionnaire contenant les statistiques principales
     """
-    print(f"COLUMNS: {df.columns}")
     total_conso = df["consommation"].sum()
     total_prod = df["production"].sum()
     total_energy = df["total"].sum()
