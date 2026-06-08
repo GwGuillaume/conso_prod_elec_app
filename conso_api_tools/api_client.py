@@ -37,10 +37,17 @@ ensure_folder(config.FOLDER_30MIN)
 # 🔧 FONCTIONS PRINCIPALES
 # -------------------------------
 
+_ENEDIS_TOKEN: Optional[str] = None
+
 def _current_token() -> Optional[str]:
     """Retourne le token ENEDIS_TOKEN depuis .env ou l'environnement."""
-    load_dotenv(override=True)  # recharge le .env à chaque appel
-    return getenv("ENEDIS_TOKEN")
+    global _ENEDIS_TOKEN
+    if _ENEDIS_TOKEN is None:
+        # Charge le .env s'il existe (local), sinon utilise les variables d'env (GHA)
+        load_dotenv()
+        _ENEDIS_TOKEN = getenv("ENEDIS_TOKEN")
+    
+    return _ENEDIS_TOKEN
 
 def _get_headers(token: Optional[str] = None) -> dict:
     """
@@ -93,12 +100,15 @@ def download_interval_data(date_str: str, interval: str = "30min") -> dict | Non
                 return None
             else:
                 print(f"💥 Erreur API définitive pour {date_str}: {err}")
-                raise SystemExit(err)
+                return None
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
             if attempt < max_retries - 1:
-                time.sleep(5)
+                wait = 5
+                print(f"⚠️ Erreur de connexion/timeout pour {date_str}. Tentative {attempt+2}/{max_retries} dans {wait}s...")
+                time.sleep(wait)
                 continue
-            raise SystemExit(e)
+            print(f"📡 Échec de connexion définitif pour {date_str}: {e}")
+            return None
     return None
 
 def append_to_csv(data: dict, csv_file: Path):
