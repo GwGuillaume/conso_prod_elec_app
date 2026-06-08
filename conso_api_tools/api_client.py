@@ -49,7 +49,7 @@ def _get_headers(token: Optional[str] = None) -> dict:
     if not tok:
         raise RuntimeError("⚠️ Aucun token disponible (ENEDIS_TOKEN non défini).")
     return {
-        "Authorization": f"Bearer {config.ENEDIS_TOKEN}",
+        "Authorization": f"Bearer {tok}",
         "Accept": "application/json",
         "User-Agent": "github.com/gguillaume/conso-prod-elec",
         "From": "contact@example.com",
@@ -69,19 +69,17 @@ def download_interval_data(date_str: str, interval: str = "30min") -> dict | Non
     day_after = format_date_to_str(next_day(format_str_to_date(date_str)))
     url = f"{config.API_BASE_URL}?prm={config.LINKY_PRM}&start={date_str}&end={day_after}"
 
-    response = requests.get(url, headers=_get_headers(), timeout=20)
     try:
+        response = requests.get(url, headers=_get_headers(), timeout=20)
         response.raise_for_status()
         data = response.json()
         if "interval_reading" not in data:
             raise ValueError(f"Aucune donnée disponible pour {date_str} ({interval})")
         return data
     except requests.exceptions.HTTPError as err:
-        err_mess = err.args[0]
-        end_date_str = err_mess[err_mess.rfind('&end=')+5:]
-        end_date = format_str_to_date(end_date_str).date()
-        if end_date == datetime.today().date():
-            print(f"❌ Données du {end_date} pas encore disponibles, pas de téléchargement.")
+        # Si la date de fin demandée est aujourd'hui, l'erreur est normale car les données ne sont pas prêtes
+        if day_after == format_date_to_str(datetime.today()):
+            print(f"❌ Données du {date_str} non disponibles (date cible {day_after} est aujourd'hui).")
             pass
         else:
             raise SystemExit(err)
