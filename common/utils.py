@@ -524,7 +524,7 @@ def check_json_in_archive(zip_path:Path, date_str: str, interval_folder: str) ->
     """
     zip_files = extract_zip_file_list(
                     zip_path = zip_path)
-    json_name = f"{interval_folder}/courbe_{date_str}.json"
+    json_name = f"{interval_folder}/conso_{date_str}.json"
     return json_name in zip_files
 
 def extract_csv_from_zip(zip_path: Path, dest_folder: Path) -> Path:

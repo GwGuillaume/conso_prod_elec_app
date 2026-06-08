@@ -16,6 +16,7 @@ Utilise :
 
 import pandas as pd
 from datetime import datetime, timedelta
+import time
 import requests
 from pathlib import Path
 from typing import Optional
@@ -68,21 +69,37 @@ def download_interval_data(date_str: str, interval: str = "30min") -> dict | Non
     """
     day_after = format_date_to_str(next_day(format_str_to_date(date_str)))
     url = f"{config.API_BASE_URL}?prm={config.LINKY_PRM}&start={date_str}&end={day_after}"
+    max_retries = 3
 
-    try:
-        response = requests.get(url, headers=_get_headers(), timeout=20)
-        response.raise_for_status()
-        data = response.json()
-        if "interval_reading" not in data:
-            raise ValueError(f"Aucune donnée disponible pour {date_str} ({interval})")
-        return data
-    except requests.exceptions.HTTPError as err:
-        # Si la date de fin demandée est aujourd'hui, l'erreur est normale car les données ne sont pas prêtes
-        if day_after == format_date_to_str(datetime.today()):
-            print(f"❌ Données du {date_str} non disponibles (date cible {day_after} est aujourd'hui).")
-            pass
-        else:
-            raise SystemExit(err)
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, headers=_get_headers(), timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            if "interval_reading" not in data:
+                raise ValueError(f"Aucune donnée disponible pour {date_str} ({interval})")
+            return data
+        except requests.exceptions.HTTPError as err:
+            # Gestion des erreurs serveur transitoires (502, 503, 504)
+            if response.status_code in [502, 503, 504] and attempt < max_retries - 1:
+                wait = (attempt + 1) * 10
+                print(f"⚠️ Erreur {response.status_code} (Serveur Boris/Enedis). Tentative {attempt+2}/{max_retries} dans {wait}s...")
+                time.sleep(wait)
+                continue
+
+            # Si la date de fin demandée est aujourd'hui, l'erreur est attendue
+            if day_after == format_date_to_str(datetime.today()):
+                print(f"❌ Données du {date_str} non disponibles (date cible {day_after} est aujourd'hui).")
+                return None
+            else:
+                print(f"💥 Erreur API définitive pour {date_str}: {err}")
+                raise SystemExit(err)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            if attempt < max_retries - 1:
+                time.sleep(5)
+                continue
+            raise SystemExit(e)
+    return None
 
 def append_to_csv(data: dict, csv_file: Path):
     """
