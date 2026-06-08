@@ -37,9 +37,7 @@ def format_str_to_date(date_str: str) -> datetime:
     Retour :
         datetime : date formatée
     """
-    return datetime.strptime(
-        date_str = date_str, 
-        format = "%Y-%m-%d")
+    return datetime.strptime(date_str, "%Y-%m-%d")
 
 def yesterday() -> datetime:
     """
