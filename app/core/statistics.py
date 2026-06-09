@@ -32,6 +32,8 @@ def compute_summary(df: pd.DataFrame) -> dict:
     total_conso = df["consommation"].sum()
     total_prod = df["production"].sum()
     total_energy = df["total"].sum()
+    estimated_cost_eur = round(df["consumption_cost_eur"].sum() if "consumption_cost_eur" in df.columns else 0.0, 2)
+    estimated_savings_eur = round(df["production_savings_eur"].sum() if "production_savings_eur" in df.columns else 0.0, 2)
 
     ratio_autoconso = (total_prod / total_conso * 100) if total_conso else 0
     ratio_surplus = ((total_prod - total_conso) / total_prod * 100) if total_prod else 0
@@ -46,6 +48,8 @@ def compute_summary(df: pd.DataFrame) -> dict:
         "total_energy_kWh": round(
             number = total_energy / 1000, 
             ndigits = 2),
+        "estimated_cost_eur": estimated_cost_eur,
+        "estimated_savings_eur": estimated_savings_eur,
         "autoconsommation_%": round(
             number = ratio_autoconso, 
             ndigits = 2),
@@ -69,7 +73,7 @@ def get_summary_info(df: pd.DataFrame, mode: str) -> str:
     # la fonction print_general_info de common.data_tools renvoie déjà un texte formaté
     try:
         info = dt.print_general_info(
-            display_mode = mode, 
+            display_mode = mode,
             df = df)
     except Exception:
         # fallback minimal si la fonction n'existe pas ou échoue
@@ -125,6 +129,8 @@ def compute_basic_stats(df: pd.DataFrame) -> pd.DataFrame:
     # Construction d'un tableau propre pour affichage
     data = [
         ("Consommation totale (kWh)", summary["total_conso_kWh"]),
+        ("Coût estimé (€)", summary["estimated_cost_eur"]),
+        ("Économies estimées (€)", summary["estimated_savings_eur"]),
         ("Production totale (kWh)", summary["total_prod_kWh"]),
         ("Énergie totale (kWh)", summary["total_energy_kWh"]),
         ("Autoconsommation (%)", summary["autoconsommation_%"]),

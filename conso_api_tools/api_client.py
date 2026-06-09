@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 from os import getenv
 
 from conso_api_tools import config
-from common.utils import ensure_folder, add_file_to_zip, save_json, check_json_in_archive, format_date_to_str, next_day, format_str_to_date
+from common.utils import ensure_folder, add_file_to_zip, save_json, check_json_in_archive, format_date_to_str, format_str_to_date, next_day
 
 # -------------------------------
 # ⚙️ CONFIGURATION DES DOSSIERS

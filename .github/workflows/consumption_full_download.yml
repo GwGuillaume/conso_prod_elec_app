@@ -15,10 +15,10 @@ jobs:
       PYTHONPATH: .
     steps:
       - name: 📦 Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🐍 Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -33,7 +33,14 @@ jobs:
           echo "🚀 Starting full Enedis download..."
           python conso_api_tools/fetch_history.py
 
-      - name: 💾 Commit consumption data to repository
+      - name: � Download electricity price history
+        if: ${{ env.PRICE_DATA_URL != '' }}
+        env:
+          PRICE_DATA_URL: ${{ vars.PRICE_DATA_URL }}
+        run: |
+          python conso_api_tools/fetch_price_history.py
+
+      - name: �💾 Commit consumption data to repository
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"

@@ -5,7 +5,7 @@ de consommation et de production électrique.
 """
 
 from common.file_utils import load_clean_data
-from common.data_tools import merge_conso_prod_data
+from common.data_tools import load_price_data, merge_conso_prod_data
 from conso_api_tools.config import CSV_30MIN as conso_csv
 from prod_api_tools.config import CSV_30MIN as prod_csv
 
@@ -19,7 +19,8 @@ def load_merged_data():
     """
     conso_df = load_clean_data(conso_csv)
     prod_df = load_clean_data(prod_csv)
-    return merge_conso_prod_data(conso_df, prod_df)
+    price_df = load_price_data()
+    return merge_conso_prod_data(conso_df, prod_df, price_df=price_df)
 
 
 def get_period_limits(df):
